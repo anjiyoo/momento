@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 앱경로
     'apps',
-    # 'apps.travel',
+    'apps.travel',
 ]
 
 MIDDLEWARE = [
