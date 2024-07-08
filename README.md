@@ -3,14 +3,12 @@
 
 
 # MOMENTO 
-***
 **MOMENTO**는 나만의 여행일정을 공유하고 여행상품을 예약&구매 할 수 있는 플랫폼으로
 앱 트리플을 클론코딩한 Django 프로젝트입니다.
 
 <br>
 
 ## 주요 기능
-***
 ** 1.로그인&회원가입 **
 - Google 소셜 로그인을 지원합니다.
 
@@ -99,17 +97,14 @@
 	- 로그인할 수 있습니다.
     - Google 소셜 로그인을 통해 회원가입할 수 있습니다.
 
-
 <br>
 
 ## ERD
-***
 [**ERD**](https://www.erdcloud.com/d/z8SRaoeiWuxRxhHBN) 를 보려면 클릭하세요.
 
 <br>
 
 ## 설치 및 실행 방법
-***
 **1.저장소 클론**
 ```
 git clone https://github.com/anjiyoo/momento.git
@@ -142,7 +137,6 @@ python manage.py runserver
 <br>
 
 ## 크레딧
-***
 이 프로젝트는 다음과 같은 오픈소스패키지를 사용합니다.
 - python
 - Django
@@ -151,6 +145,5 @@ python manage.py runserver
 
 <br>
 
-****
- **GitHub**
+ **GitHub** <br>
 @anjiyoo  ·  @ansghltjd  ·  @nyeonseoioio  ·  @yangchanghun  ·  @HalalGuys1232
