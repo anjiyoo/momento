@@ -144,5 +144,5 @@ python manage.py runserver
 
 <br>
 
-### GitHub
-@anjiyoo  ·  @ansghltjd  ·  @nyeonseoioio  ·  @yangchanghun  ·  @HalalGuys1232
+## GitHub
+`@anjiyoo`  ·  `@ansghltjd`  ·  `@nyeonseoioio`  ·  `@yangchanghun`  ·  `@HalalGuys1232`
