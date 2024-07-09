@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'baenangtalk/main.css' %}">
+{% endblock %}
+<div class="container mt-3">
+    <h3 class="mb-4">배낭톡</h3>
+        
+    <div class="btn-group" style="text-align: right;">
+        <button type="button" class="btn btn-outline-light btn-custom dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #0BD0AF;">
+            도시 선택
+        </button>
+        <div class="dropdown-menu">
+            {% for city in cities %}
+            <a class="dropdown-item" href="{% url 'baenangtalk:city_posts' city.id %}">{{ city.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 배낭톡 작성 -->
+    <div style="text-align: right; margin-top: 10px;">
+        <a href="{% url 'baenangtalk:bae_create' %}" class="bi bi-pencil-fill" id="create-post-btn"></a>
+    </div>
+
+    <ul>
+        {% for post in posts %}
+        <li>
+            <h2>{{ post.bae_title }}</h2>
+            <p>{{ post.bae_content }}</p>
+            <img src="{{ post.bae_img.url }}" alt="{{ post.bae_title }}">
+            <p>작성일: {{ post.bae_date }}</p>
+            <p>좋아요 수: {{ post.bae_like }}</p>
+            <!-- 좋아요 누른 회원 목록은 필요에 따라 추가 -->
+        </li>
+        {% empty %}
+        <div>작성된 게시글이 없습니다.</div>
+        {% endfor %}
+    </ul>
+</div>
+
+{% endblock %}

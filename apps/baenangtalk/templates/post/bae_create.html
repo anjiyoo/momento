@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'baenangtalk/main.css' %}">
+{% endblock %}
+<div class="container mt-3">
+    <h3 class="mb-4">배낭톡</h3>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">작성 완료</button>
+        </form>
+</div>        
+{% endblock %}

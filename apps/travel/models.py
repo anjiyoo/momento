@@ -1,6 +1,5 @@
 from django.db import models
-from django.urls import reverse
-    
+
 # 도시
 class County(models.Model):
     city_name = models.CharField('도시명', max_length=10)  # 도시명
