@@ -11,10 +11,14 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+
+from dotenv import load_dotenv
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 
 # Quick-start development settings - unsuitable for production
@@ -39,11 +43,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     #allauth
-#    'django.contrib.sites',  # 필요한 경우
-#    'allauth',
-#    'allauth.account',
-#    'allauth.socialaccount',
-#    'allauth.socialaccount.providers.google',
+    'django.contrib.sites',  # 필요한 경우
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
     # 앱경로
     'apps',
     'apps.travel',
@@ -59,7 +63,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-#    'allauth.account.middleware.AccountMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 
@@ -126,25 +130,28 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
-#    'allauth.account.auth_backends.AuthenticationBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 )
-#SITE_ID = 1
+SITE_ID = 1
 AUTH_USER_MODEL = 'userinfo.User'
-#SOCIALACCOUNT_PROVIDERS = {
-#    'google': {
-#        'SCOPE': ['profile', 'email'],
-#        'AUTH_PARAMS': {'access_type': 'online'},
-#        'ID_TOKEN_VERIFICATION': True,
-#        'AUTH_EXTRA_ARGUMENTS': {'prompt': 'select_account'},
-#        'APP': {
-#        },
-#        'FIELDS': ['email', 'nickname'],
-#        'EXCHANGE_TOKEN': True,
-#        'LOCALE_FUNC': 'path.to.callable',
-#        'VERIFIED_EMAIL': False,
-#        'VERSION': 'v2.0',
-#    }
-#}
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+        'ID_TOKEN_VERIFICATION': True,
+        'AUTH_EXTRA_ARGUMENTS': {'prompt': 'select_account'},
+        'APP': {
+            'client_id': os.getenv('GOOGLE_ALLAUTH_ID'),
+            'secret': os.getenv('GOOGLE_ALLAUTH_SECRET'),
+            'key': '',
+        'FIELDS': ['email', 'nickname'],
+        'EXCHANGE_TOKEN': True,
+        'LOCALE_FUNC': 'path.to.callable',
+        'VERIFIED_EMAIL': False,
+        'VERSION': 'v2.0',
+        }
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -176,3 +183,4 @@ MEDIA_ROOT = BASE_DIR/'media'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_REDIRECT_URL = '/'
