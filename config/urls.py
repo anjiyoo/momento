@@ -27,5 +27,6 @@ urlpatterns = [
     path('mypage/', login_required(TemplateView.as_view(template_name='mypage.html')), name='mypage'),
     path('accounts/', include('allauth.urls')),
     path('accounts/profile/', login_required(TemplateView.as_view(template_name='profile.html')), name='profile'),
-
+    path('baenangtalk/', include("apps.baenangtalk.urls")),
+  
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

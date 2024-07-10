@@ -7,5 +7,5 @@ class User(AbstractUser):
     email = models.EmailField(null=True, blank=True)
     telnum = models.CharField(max_length=15, null=True, blank=True)
 
-    def __str__(self):
+    def str(self):
         return self.username
