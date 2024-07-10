@@ -138,7 +138,7 @@ class PostCreateView(CreateView):
         if form.is_valid():
             # 폼이 유효하면 데이터 저장
             baenangtalk = form.save(commit=False)  # 데이터베이스에 바로 저장하지 않고 인스턴스 생성
-            baenangtalk.author = request.user  # 현재 사용자를 작성자로 설정 
+            baenangtalk.user = request.user  # 현재 사용자를 작성자로 설정 
             baenangtalk.save()  # 데이터베이스에 저장
 
             # 게시글 작성 완료 후 리다이렉트
@@ -183,16 +183,19 @@ class PostEditView(UpdateView):
 
 # 배낭톡 delete
 class PostDeleteView(DeleteView):
+    model = Baenangtalk  # Baenangtalk 모델을 대상으로 한다고 명시
+    template_name = 'post/bae_delete.html'
+
     def post(self, request, pk):
         baenangtalk = get_object_or_404(Baenangtalk, pk=pk)  # pk에 해당하는 Baenangtalk 객체 가져오기
 
         # 현재 사용자가 작성자인지 확인
-        if baenangtalk.author == request.user:
+        if baenangtalk.user == request.user:
             # 작성자일 경우 삭제
             baenangtalk.delete()
 
         # 삭제 후 리다이렉트할 URL 설정 
-        return redirect('bae_main') 
+        return redirect('baenangtalk:bae_main') 
 
 
 # 배낭톡 좋아요 ##############################################################################
