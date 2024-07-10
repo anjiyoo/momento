@@ -23,5 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include("apps.travel.urls")),
     path('mypage/', include("apps.userinfo.urls")),
-#    path('accounts/', include('allauth.urls')),
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # path('accounts/', include('allauth.urls')),
+    path('baenangtalk/', include("apps.baenangtalk.urls")),
+
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

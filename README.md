@@ -79,8 +79,9 @@
 
 **10.배낭톡**
 - 도시별 여행자 커뮤니티 게시판 입니다.
-- 여행기간 최신순으로 게시글을 확인할 수 있습니다.
+- 최근 작성된 게시글을 확인할 수 있습니다.
 - 주제에 따른 게시글을 필터링할 수 있습니다.
+- 여행시기(월별)에 따른 게시글을 필터링할 수 있습니다.
 - 배낭톡은 회원만 작성 가능합니다.
 - 배낭톡에 대한 이용규칙 게시글을 제공합니다.
 - 배낭톡에 대한 문의를 작성할 수 있습니다.
@@ -123,6 +124,9 @@
 
 <br>
 
+**14.ChatGPT 코드 리뷰 워크플로우 스크립트 작성**
+- GitHub Action은 통해 워크플로우 스크립트 작성
+
 ## ERD
 [**ERD**](https://www.erdcloud.com/d/z8SRaoeiWuxRxhHBN) 를 보려면 클릭하세요.
 
@@ -135,9 +139,11 @@ git clone https://github.com/anjiyoo/momento.git
 cd MOMENTO
 ```
 
-**2.가상환경 설치**
+**2.가상환경 설치 및 실행**
 ```
-python -m venv venv
+python -m venv momento
+source momento/bin/activate  # mac
+source momento\Scripts\activate  # window
 ```
 
 **3.필요한 패키지 설치**
