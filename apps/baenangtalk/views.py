@@ -13,12 +13,13 @@ class MainPostListView(ListView):
     context_object_name = 'posts'
 
     def get_queryset(self):
-        queryset = Baenangtalk.objects.all()
+        # 모든 객체 가져오기
+        queryset = Baenangtalk.objects.all() 
 
         # URL에서 전달된 county_id, period_id, subject_id 가져오기
-        county_id = self.kwargs.get('county_id')
-        period_id = self.kwargs.get('period_id')
-        subject_id = self.kwargs.get('subject_id')
+        county_id = self.request.GET.get('county_id')  
+        period_id = self.request.GET.get('period_id') 
+        subject_id = self.request.GET.get('subject_id') 
 
         # 필터링 조건 추가
         if county_id:
@@ -28,22 +29,38 @@ class MainPostListView(ListView):
         if subject_id:
             queryset = queryset.filter(subject_id=subject_id)
 
+        # 내림차순 정렬
         return queryset.order_by('-bae_date')
 
+    # 템플릿에 전달할 data
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # county_id, period_id, subject_id에 해당하는 객체 가져오기
-        county_id = self.kwargs.get('county_id')
-        period_id = self.kwargs.get('period_id')
-        subject_id = self.kwargs.get('subject_id')
+        # URL에서 전달된 county_id, period_id, subject_id 가져오기
+        county_id = self.request.GET.get('county_id') 
+        period_id = self.request.GET.get('period_id')  
+        subject_id = self.request.GET.get('subject_id')  
 
         if county_id:
-            context['county'] = County.objects.get(pk=county_id)
+            context['selected_county'] = County.objects.get(pk=county_id)
         if period_id:
-            context['period'] = BaenangtalkPeriod.objects.get(pk=period_id)
+            context['selected_period'] = BaenangtalkPeriod.objects.get(pk=period_id)
         if subject_id:
-            context['subject'] = BaenangtalkSubject.objects.get(pk=subject_id)
+            context['selected_subject'] = BaenangtalkSubject.objects.get(pk=subject_id)
+
+        if county_id:
+            context['county_id'] = int(county_id)
+        if period_id:
+            context['period_id'] = int(period_id)
+        if subject_id:
+            context['subject_id'] = int(subject_id)
+
+        # 모든 county 가져오기
+        context['counties'] = County.objects.all()
+        # 모든 여행시기 가져오기
+        context['periods'] = BaenangtalkPeriod.objects.all()
+        # 모든 주제 가져오기
+        context['subjects'] = BaenangtalkSubject.objects.all()
 
         return context
     
@@ -165,11 +182,11 @@ def bae_post_like(request, pk):
     if request.method == 'POST':
         post = get_object_or_404(Baenangtalk, pk=pk)
 
-        if request.user.customer:  # 사용자 계정인 경우
-            customer = Customer.objects.get(user=request.user)
+        if request.user.user:  # 사용자 계정인 경우
+            user = User.objects.get(user=request.user)
 
-            if customer not in post.liked_by.all():
-                post.liked_by.add(customer)
+            if user not in post.liked_by.all():
+                post.liked_by.add(user)
                 post.bae_like += 1
                 post.save()
 
@@ -185,10 +202,10 @@ def bae_post_unlike(request, pk):
         post = get_object_or_404(Baenangtalk, pk=pk)
 
         if request.user.customer:  # 사용자 계정인 경우
-            customer = Customer.objects.get(user=request.user)
+            user = User.objects.get(user=request.user)
 
-            if customer in post.bae_like_by.all():
-                post.bae_like_by.remove(customer)
+            if user in post.bae_like_by.all():
+                post.bae_like_by.remove(user)
                 post.bae_like -= 1
                 post.save()
 

@@ -11,6 +11,11 @@ urlpatterns = [
     path('create/', PostCreateView.as_view(), name='bae_create'),  
     path('eidt/<int:pk>/', PostEditView.as_view(), name='bae_edit'),  
     path('delete/<int:pk>/', PostDeleteView.as_view(), name='bae_delete'),  
+    
+    path('city/<int:county_id>/', MainPostListView.as_view(), name='city_posts'),  # 도시 선택
+    path('period/<int:period_id>/', MainPostListView.as_view(), name='period_posts'),  # 여행시기 선택
+    path('subject/<int:subject_id>/', MainPostListView.as_view(), name='subject_posts'),  # 주제 선택
+    
     # 좋아요&취소
     path('like/<int:pk>/', views.bae_post_like, name='bae_like'),  
     path('unlike/<int:pk>/', views.bae_post_unlike, name='bae_unlike'),  

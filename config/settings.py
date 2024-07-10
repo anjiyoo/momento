@@ -38,10 +38,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #allauth
+#    'django.contrib.sites',  # 필요한 경우
+#    'allauth',
+#    'allauth.account',
+#    'allauth.socialaccount',
+#    'allauth.socialaccount.providers.google',
     # 앱경로
     'apps',
     'apps.travel',
     'apps.baenangtalk',
+    'apps.userinfo',
 ]
 
 MIDDLEWARE = [
@@ -52,7 +59,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+#    'allauth.account.middleware.AccountMiddleware',
 ]
+
 
 ROOT_URLCONF = 'config.urls'
 
@@ -115,12 +124,32 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+#    'allauth.account.auth_backends.AuthenticationBackend',
+)
+#SITE_ID = 1
+AUTH_USER_MODEL = 'userinfo.User'
+#SOCIALACCOUNT_PROVIDERS = {
+#    'google': {
+#        'SCOPE': ['profile', 'email'],
+#        'AUTH_PARAMS': {'access_type': 'online'},
+#        'ID_TOKEN_VERIFICATION': True,
+#        'AUTH_EXTRA_ARGUMENTS': {'prompt': 'select_account'},
+#        'APP': {
+#        },
+#        'FIELDS': ['email', 'nickname'],
+#        'EXCHANGE_TOKEN': True,
+#        'LOCALE_FUNC': 'path.to.callable',
+#        'VERIFIED_EMAIL': False,
+#        'VERSION': 'v2.0',
+#    }
+#}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LLANGUAGE_CODE = 'ko-kr'
+LANGUAGE_CODE = 'ko-kr'
 
 TIME_ZONE = 'Asia/Seoul'
 
