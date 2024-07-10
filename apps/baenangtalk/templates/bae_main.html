@@ -13,7 +13,7 @@
     
     <!-- 도시 선택 -->
     <div class="btn-group" style="text-align: right;">
-        <button type="button" class="btn btn-outline-light btn-custom dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #0BD0AF;">
+        <button type="button" class="btn btn-outline-light btn-custom dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #0BD0AF; margin-right: 10px;">
             {% if county_id %}
                 <strong>{{ selected_county.city_name }}</strong>
             {% else %}
@@ -31,7 +31,7 @@
 
     <!-- 여행시기 선택 -->
     <div class="btn-group" style="text-align: right;">
-        <button type="button" class="btn btn-outline-light btn-custom dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #0BD0AF;">
+        <button type="button" class="btn btn-outline-light btn-custom dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #0BD0AF; margin-right: 10px;">
             {% if period_id and selected_period %}
                 <strong>{{ selected_period.bae_month|date:"M" }}</strong>
             {% else %}
@@ -82,7 +82,9 @@
                 <img src="{{ post.bae_img.url }}" class="card-img-top" style="height: 240px; object-fit: cover; object-position: center;" alt="{{ post.bae_title }}">
                 <div class="card-body">
                     <!-- 제목 -->
-                    <h5 class="card-title">{{ post.bae_title }}</h5>
+                    <h5 class="card-title">
+                        <a href="{% url 'baenangtalk:bae_detail' post.id %}">{{ post.bae_title }}</a>
+                    </h5>
                     <!-- 내용 -->
                     <p class="card-text">{{ post.bae_content }}</p>
                     <!-- 좋아요 & 댓글 & 작성일 -->
