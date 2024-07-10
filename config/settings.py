@@ -42,12 +42,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #allauth
-    'django.contrib.sites',  # 필요한 경우
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
+    # allauth
+    # 'django.contrib.sites',  # 필요한 경우
+   'allauth',
+   'allauth.account',
+   'allauth.socialaccount',
+   'allauth.socialaccount.providers.google',
     # 앱경로
     'apps',
     'apps.travel',
@@ -63,7 +63,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+<<<<<<< HEAD
     'allauth.account.middleware.AccountMiddleware',
+=======
+   'allauth.account.middleware.AccountMiddleware',
+>>>>>>> b7b618c (<feat>: 구글 소셜로그인)
 ]
 
 
@@ -135,6 +139,7 @@ AUTHENTICATION_BACKENDS = (
 SITE_ID = 1
 AUTH_USER_MODEL = 'userinfo.User'
 SOCIALACCOUNT_PROVIDERS = {
+<<<<<<< HEAD
     'google': {
         'SCOPE': ['profile', 'email'],
         'AUTH_PARAMS': {'access_type': 'online'},
@@ -151,6 +156,21 @@ SOCIALACCOUNT_PROVIDERS = {
         'VERSION': 'v2.0',
         }
     }
+=======
+   'google': {
+       'SCOPE': ['profile', 'email'],
+       'AUTH_PARAMS': {'access_type': 'online'},
+       'ID_TOKEN_VERIFICATION': True,
+       'AUTH_EXTRA_ARGUMENTS': {'prompt': 'select_account'},
+       'APP': {
+       },
+       'FIELDS': ['email', 'nickname'],
+       'EXCHANGE_TOKEN': True,
+       'LOCALE_FUNC': 'path.to.callable',
+       'VERIFIED_EMAIL': False,
+       'VERSION': 'v2.0',
+   }
+>>>>>>> b7b618c (<feat>: 구글 소셜로그인)
 }
 
 # Internationalization
