@@ -25,5 +25,6 @@ urlpatterns = [
     path('mypage/', include("apps.userinfo.urls")),
     # path('accounts/', include('allauth.urls')),
     path('baenangtalk/', include("apps.baenangtalk.urls")),
+    path('accommodation/', include("apps.accommodation.urls")),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

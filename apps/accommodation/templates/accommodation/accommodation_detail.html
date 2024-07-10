@@ -1,0 +1,769 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ accommodation.name }} 상세 정보</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+  
+
+     
+    <style>
+        .container {
+            max-width: 800px; /* 최대 너비 설정 */
+            margin: 0 auto; /* 가운데 정렬 */
+            padding: 30px 20px; /* 내부 여백 설정 */
+            background-color: #ffffff; /* 박스 배경색 */
+            border-radius: 10px; /* 모서리 둥글게 */
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* 그림자 */
+        }
+        .image-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; 
+        }
+        #image-container {
+            position: relative;
+            width: 100%;
+            height: 66.67vh; /* 화면 높이의 2/3 */
+            overflow: hidden;
+        }
+        #image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .overlay-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.5);
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 24px;
+            /* color: black; */
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #prev-button {
+            left: 10px;
+        }
+        #next-button {
+            right: 10px;
+        }
+        .star-rating {
+            display: inline-block;
+            font-size: 0;
+           
+        }
+        .star-rating .star {
+            font-size: 20px;
+            color: #ddd; 
+        }
+        .star-rating .star.filled {
+            color: #f5c518; 
+        }
+        .like-container {
+            display: flex;
+            align-items: center;
+           
+        }
+        .like-container .like-count {
+            margin-left: 5px; /* 아이콘과 숫자 사이의 간격 */
+        }
+        .custom-button {
+            background-color: white;
+            border: 1px solid gray;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 2px;
+        }
+        .custom-button:hover {
+            background-color: #f0f0f0; /* 호버 시 약간 어두운 색 */
+        }
+        .custom-button:active,
+        .custom-button:focus {
+            outline: none; /* 눌렀을 때 아웃라인 없애기 */
+            box-shadow: none; /* 눌렀을 때 그림자 없애기 */
+            background-color: white; /* 눌렀을 때 배경색 유지 */
+        }
+        .button-container {
+            margin-left: 50px; /* 컨테이너에 왼쪽 여백 추가 */
+        }
+
+        .button-container .custom-button + .custom-button {
+            margin-left: 5px; /* 두 버튼 사이의 간격 */
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }ㅣ
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .icon-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            padding: 0;
+            margin: 0 5px;
+        }
+
+        .icon-button:focus {
+            outline: none;
+        } 
+        /* 모달 스타일 */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+        }
+
+        .modal-content {
+            
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 60%;
+            max-width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: left;
+            position: relative;
+        }
+
+        .close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .horizontal-input-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .horizontal-input-group button {
+            margin: 0 5px;
+        }
+
+        .horizontal-input-group input {
+            margin: 0 5px;
+            width: 50px;
+            height: 40px;
+            border: none;
+            text-align: center;
+            padding: 0
+        }
+        .counter {
+            display: flex;
+            align-items: center;
+            margin-left: 90px; 
+        }
+        .room-item {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* 이미지가 맨 오른쪽에 위치하도록 설정 */
+            margin-bottom: 20px;
+        }
+
+        .room-details {
+            flex:1;
+        }
+     
+        .room-header {
+            display: flex;
+            align-items: center;
+        }
+        .room-name {
+            margin-right: 20px; /* h3 요소와 이미지 사이의 간격 */
+        }
+        .room-capacity {
+        margin-right: 20px; /* 최대 인원 정보와 이미지 사이의 간격 */
+        }
+        .room-info-card {
+            position: relative;
+            padding: 20px;
+            border: 1px solid #ffffff;
+            border-radius: 8px;
+            background-color: #ffffff;
+            margin-bottom: 20px;
+            padding-top: 30px;
+
+        }
+
+        .room-info-card h3 {
+            margin: 0;
+            padding-bottom: 10px;
+        }
+
+        .room-info-card p {
+            margin: 0;
+            padding-bottom: 10px;
+
+        }
+
+        .room-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            position: absolute;
+            top:10px;
+            right: 45px;
+
+        }
+        .room-card {
+            padding: 20px;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            background-color: #f0f0f0;
+            margin-top: 10px;
+            margin-right: 40px;
+            position: relative;
+        }
+        .select-button {
+            position: absolute;
+            right: 20px; /* 오른쪽 끝에서 20px 떨어진 위치 */
+            bottom: 20px; /* 아래쪽 끝에서 20px 떨어진 위치 */
+            width: 100px;
+
+        }
+        .card {
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            margin-right: 40px;
+            position: relative;
+        }
+        #lowest_price:hover {
+            color: gray;
+        }
+        .center-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .center-button button {
+            background-color: #007bff; /* 파란색 */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        .center-button button:hover {
+            background-color: #0056b3; /* 호버 시 더 진한 파란색 */
+        }
+        .select-button:hover {
+            background-color: #0056b3; /* 호버 시 더 진한 파란색 */
+        }
+        #image-container {
+            position: relative;
+            width: 100%;
+            height: 66.67vh; /* 화면 높이의 2/3 */
+            overflow: hidden;
+        }
+        #image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+
+    </style>
+</head>
+
+    <div class="container mt-4">
+        
+        <div style="display: flex; justify-content: center; align-items: center;">
+
+            <div id="roomImagesCarousel" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner" id="image-container">
+                    {% for image in images %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <img src="{{MEDIA_URL}}{{ image.images }}" class="d-block w-100" alt="Room Image">
+                        </div>
+                    {% endfor %}
+                </div>
+                <a class="carousel-control-prev" href="#roomImagesCarousel" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#roomImagesCarousel" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 숙소 이름 -->
+        <h1 style="margin-left: 70px; margin-top: 30px;">{{ accommodation.name }}</h1>
+
+        <!-- 저장 수 -->
+        <div style="display: flex; align-items: center; margin-left: 70px;">
+            
+                <div class="like-container">
+                    <i class="bi bi-heart-fill"style="color: red;"></i>
+                    <span class="like-count">{{ likes_count }}</span>
+                </div>
+        
+
+        <!-- 별점 -->
+        <div style="display: flex; align-items: center; margin-right: 10px;margin-left: 10px">
+
+            <div class="star-rating" id="star-rating" style="margin-right: 10px;">
+            <span class="star">&#9733;</span>
+            <span class="star">&#9733;</span>
+            <span class="star">&#9733;</span>
+            <span class="star">&#9733;</span>
+            <span class="star">&#9733;</span>
+        </div>
+        <!-- 리뷰 수  -->
+        <p style= "margin-top: 15px;">{{ reviews_count }}</p>
+        
+        <a href="{% url 'map' pk=accommodation.pk %}" style="margin-left: 8px; color: blue; text-decoration: none;">리뷰 보기 ></a>
+
+        <!-- 리뷰 끝 -->
+    </div>
+    </div>
+    <div style="display: flex; align-items: center; margin-left:70px">
+        <i class="bi bi-geo-alt-fill"></i>
+        <p style="margin-left: 10px; margin-top: 15px;">{{ accommodation.city.city_name }}</p>
+        <a href="{% url 'map' pk=accommodation.pk %}" style="margin-left: 8px; color: blue;text-decoration: none;">지도 보기 ></a>
+    </div>
+
+    <!-- 구분선 -->
+    <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 50px;">
+
+    <!-- 버튼들 -->
+    <div class="d-flex justify-content-center gap-2 mt-3"  style="display: flex; justify-content: center; gap: 150px;">
+        {% if liked %}
+        <div style="text-align: center;">
+            <i class="bi bi-heart-fill" id="save-button" style="display: block; font-size: 24px; cursor: pointer;"></i>
+            <span id="save-text">저장취소</span>
+        </div>
+        {% else %}
+        <div style="text-align: center;">
+            <i class="bi bi-heart" id="save-button" style="display: block; font-size: 24px; cursor: pointer;"></i>
+            <span id="save-text">저장하기</span>
+        </div>
+        {% endif %}
+        <div style="text-align: center;">
+            <i class="bi bi-calendar-plus" style="display: block; font-size: 24px;"></i>
+            <span>일정추가</span>
+        </div>
+        <a href="{% url 'create_review' accommodation.pk %}" style="text-decoration: none; color: inherit;">
+            <div style="text-align: center;">
+                <i class="bi bi-star" style="display: block; font-size: 24px;"></i>
+                <span>리뷰쓰기</span>
+            </div>
+        </a>
+    </div>
+
+    <!-- 구분선 -->
+    <hr style="border: 0; border-top: 20px solid #e7e7e7d8; margin: 30px 0;">
+
+    <!-- 최저가 예약 / 객실 중 제일 싼 가격 띄우기 -->
+
+    <h2 style="font-weight: bold; margin-left: 50px; margin-top: 40px;">최저가 예약</h2>
+        {% csrf_token %}
+        <div style="text-align: center;">
+                <input type="text" 
+                       name="datefilter" 
+                       class="daterange" 
+                       style="margin-left: 50px; height: 38px; text-align: center; font-size: 16px;"  
+                       placeholder="날짜 선택"/>
+                       
+
+                 <input type="text" 
+                       name="guestcount" 
+                       class="guestcount" 
+                       style="margin-left: 10px; height: 38px; text-align: center; font-size: 16px; width: 200px;"  
+                       placeholder="성인 2" readonly onclick="openGuestModal()"/>           
+            </div>
+    </form>
+
+             <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 70px;">
+                <div style="margin-left: 150px;">
+                    <div style="font-size: 15px; font-weight: bold; color: rgb(94, 189, 131); font-family: 'Roboto', sans-serif;">MOMENTO</div>
+                    <div style="font-size: 12px; color: gray;">1박, 세금 포함</div>                
+                </div>  
+                <!-- <p id="lowest_price" style="font-size: 24px; font-weight: bold; text-align: right; margin-right: 90px;">{{ min_price|floatformat:0 }}원 ></p> -->
+                <p id="lowest_price" 
+                    style="font-size: 24px; font-weight: bold; text-align: right; margin-right: 90px; cursor: pointer;" 
+                    data-cheapest-room-id="{{ min_price_room_id }}"
+                    onclick="scrollToRoom()">
+                    {{ min_price|floatformat:0|intcomma }}원 >
+                </p>
+            </div> 
+           
+    
+        <!-- 모달 창 -->
+        <div style="text-align: center;">
+            <div id="guestModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeGuestModal()">&times;</span>
+                    <h2 style = "margin-left: 30px">인원 선택</h2>
+
+            <!-- 구분선 -->
+            <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 30px;">
+                <div class="horizontal-input-group">
+                        <label for="adultCount" style="font-size: 18px; font-weight: bold;">성인</label>
+                        <div class="counter">
+                 
+                                <button class="icon-button" onclick="decreaseCount('adultCount')"><i class="bi bi-dash"></i></button>
+                                <input type="number" id="adultCount" min="1" value="2" readonly>
+                                <button class="icon-button" onclick="increaseCount('adultCount')"><i class="bi bi-plus"></i></button>
+                        </div>
+                    </div>
+                <br>
+
+                <div class="horizontal-input-group">
+                    <label for="childCount" style="font-size: 18px; font-weight: bold;">아동</label>
+                         <div class="counter">
+                            <button class="icon-button" onclick="decreaseCount('childCount')"><i class="bi bi-dash"></i></button>
+                            <input type="number" id="childCount" min="0" value="0" readonly>
+                            <button class="icon-button" onclick="increaseCount('childCount')"><i class="bi bi-plus"></i></button>
+                        </div>
+                </div>
+                <br>
+            
+
+            <!-- 구분선 -->
+            <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 30px;">
+
+            <!-- <button onclick="applyGuestCount()">선택 완료</button> -->
+            <div class="center-button">
+                <button onclick="applyGuestCount()">선택 완료</button>
+            </div>
+        </div>  
+        </div>
+    </div>
+    <!-- </div> -->
+<!-- </div> -->
+
+
+    <!-- 구분선 -->
+    <hr style="border: 0; border-top: 20px solid #e7e7e7d8; margin: 30px 0;">
+
+
+    <h2 style="font-weight: bold; margin-left: 50px; margin-top: 60px;">객실 목록</h2>
+
+    <div class="button-container">
+        <button id="includeBreakfastRoomsBtn" class="custom-button">조식 포함</button>
+        <button id="freeCancellationRoomsBtn" class="custom-button">무료 취소</button>
+    </div>
+    
+    <!-- 객실 목록 -->
+<div id="rooms">
+<div id="roomsList" style="margin-left: 50px;">
+    {% for room in accommodation.rooms.all %}
+    <div id="room-{{ room.id }}" class="room">
+    <div class="room-item" data-free-cancellation="{{ room.is_free_cancellation }}" data-include-breakfast="{{ room.includes_breakfast }}">
+        <div class="room-details">
+                <div class="room-info-card">
+                    <h3>{{ room.name }}</h3>
+                    <p>
+                        <i class="bi bi-person"></i> 최대 {{ room.capacity }}인
+                    </p>
+                    <p class="partial-cancellation" style="display: none; color: rgb(0, 113, 218);">
+                        부분 환불
+                    </p>
+                    
+                    {% if room_images %}
+                        {% for image in room_images %}
+                        <img src="{{MEDIA_URL}}{{image.images}}" alt="{{ room.name }}" class="room-image">
+                        {% endfor %}
+                    {% endif %} 
+                
+                </div>
+
+            <div class="room-card">
+                
+                <p>
+                    <i class="bi bi-person"></i> 2인 기준/ 최대 {{ room.capacity }}인
+                </p>
+                <p style="font-size: 1.5em; font-weight: bold;">
+                    {{ room.price|floatformat:0| intcomma}}원
+                </p>
+
+                <a href="{% url 'room_detail' accommodation_pk=accommodation.pk room_pk=room.pk %}" id="selectButton" class="btn btn-primary mt-4 select-button"->선택</a>
+            </div>
+    
+            <hr class="breakfastRoomsSeparator" style="border: 0; border-top: 1px solid #ccc; margin: 20px 0;">
+
+        </div>
+      
+    </div>
+
+    {% endfor %}
+
+</div>
+</div>
+    <div id="noBothConditionsRoomsMessage" class="card" style="display:none; text-align:center;">
+        조식 포함, 무료 취소 가능한 숙소가 없습니다.
+    </div>
+
+    <div id="noBreakfastRoomsMessage" class="card" style="display: none; text-align:center;">
+        <p>조식 포함된 객실이 없습니다.</p>
+    </div>
+
+        
+    <div id="noFreeCancellationRoomsMessage" class="card" style="display: none; text-align:center;">
+        <p>무료 취소 가능한 숙소가 없습니다.</p>
+    </div>
+</div>
+</div>
+
+<script>
+    // 게스트 수 모달
+    function openGuestModal() {
+            document.getElementById('guestModal').style.display = 'block';
+        }
+
+        function closeGuestModal() {
+            document.getElementById('guestModal').style.display = 'none';
+        }
+
+        function applyGuestCount() {
+            var adultCount = document.getElementById('adultCount').value;
+            var childCount = document.getElementById('childCount').value;
+            var guestCountInput = document.getElementsByName('guestcount')[0];
+            guestCountInput.value = '성인 ' + adultCount + ', 아동 ' + childCount;
+            closeGuestModal();
+        }
+
+        // 성인 및 아동 수 증가/감소
+        function increaseCount(id) {
+            var input = document.getElementById(id);
+            input.value = parseInt(input.value) + 1;
+        }
+
+        function decreaseCount(id) {
+            var input = document.getElementById(id);
+            if (input.value > input.min) {
+                input.value = parseInt(input.value) - 1;
+            }
+        }
+
+        // 최저가 방으로 스크롤
+        function scrollToRoom() {
+            var roomId = document.getElementById('lowest_price').getAttribute('data-cheapest-room-id');
+            var roomElement = document.getElementById('room-' + roomId);
+            if (roomElement) {
+                roomElement.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    $(document).ready(function() {
+        // 버튼 클릭 이벤트 핸들러
+        $('#includeBreakfastRoomsBtn, #freeCancellationRoomsBtn').click(function() {
+            $(this).toggleClass('active');
+            updateRoomVisibility();
+            updateButtonStyle($(this));
+        });
+
+        // 버튼 스타일 업데이트 함수
+        function updateButtonStyle(button) {
+            if (button.hasClass('active')) {
+                button.css({
+                    'background-color': '#3F80E0',
+                    'color': '#FFFFFF',
+                    'border-color': '#3F80E0'
+                });
+            } else {
+                button.css({
+                    'background-color': '',
+                    'color': '',
+                    'border-color': ''
+                });
+            }
+        }
+
+        // 방 가시성 업데이트 함수
+        function updateRoomVisibility() {
+            var showBreakfast = $('#includeBreakfastRoomsBtn').hasClass('active');
+            var showFreeCancellation = $('#freeCancellationRoomsBtn').hasClass('active');
+
+            var hasBreakfastRooms = false;
+            var hasFreeCancellationRooms = false;
+            var hasBothConditionsRooms = false;
+
+            $('#roomsList .room-item').each(function() {
+                var isIncludeBreakfast = $(this).data('include-breakfast') === "True";
+                var isFreeCancellation = $(this).data('free-cancellation') === "True";
+
+                var showRoom = true;
+
+                if (showBreakfast && !isIncludeBreakfast) {
+                    showRoom = false;
+                }
+
+                if (showFreeCancellation && !isFreeCancellation) {
+                    showRoom = false;
+                }
+
+                if (showRoom) {
+                    $(this).show();
+                    if (isIncludeBreakfast) {
+                        hasBreakfastRooms = true;
+                    }
+                    if (isFreeCancellation) {
+                        hasFreeCancellationRooms = true;
+                    }
+                    if (isIncludeBreakfast && isFreeCancellation) {
+                        hasBothConditionsRooms = true;
+                    }
+                } else {
+                    $(this).hide();
+                }
+            });
+
+            $('#noBothConditionsRoomsMessage').toggle(showBreakfast && showFreeCancellation && !hasBothConditionsRooms);
+            $('#noBreakfastRoomsMessage').toggle(showBreakfast && !hasBreakfastRooms);
+            $('#noFreeCancellationRoomsMessage').toggle(showFreeCancellation && !hasFreeCancellationRooms);
+        }
+
+        // 이미지 전환 기능
+        var currentIndex = 0;
+        var images = [
+            {% for image in images %}
+                "{{ MEDIA_URL }}{{ image.images }}"{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        function showImage(index) {
+            $('#image-container img').attr('src', images[index]);
+        }
+
+        $('#next-button').click(function() {
+            currentIndex = (currentIndex + 1) % images.length;
+            showImage(currentIndex);
+        });
+
+        $('#prev-button').click(function() {
+            currentIndex = (currentIndex - 1 + images.length) % images.length;
+            showImage(currentIndex);
+        });
+
+        // 날짜 선택 기능
+        var startDate = moment();
+        var endDate = moment().add(1, 'days');
+
+        $('input[name="datefilter"]').daterangepicker({
+            autoUpdateInput: false,
+            minDate: moment(),
+            startDate: startDate,
+            endDate: endDate,
+            locale: {
+                format: 'MM.DD',
+                cancelLabel: 'Clear'
+            }
+        });
+
+        $('input[name="datefilter"]').val(startDate.format('MM.DD') + ' - ' + endDate.format('MM.DD'));
+
+        $('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('MM.DD') + ' - ' + picker.endDate.format('MM.DD'));
+            $('#check_in').val(picker.startDate.format('YYYY-MM-DD'));
+            $('#check_out').val(picker.endDate.format('YYYY-MM-DD'));
+        });
+
+        $('input[name="datefilter"]').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+            $('#check_in').val('');
+            $('#check_out').val('');
+        });
+
+        
+
+        // 평균 평점 표시
+        document.addEventListener('DOMContentLoaded', function() {
+            var averageRating = {{ average_rating }};
+            var stars = document.querySelectorAll('#star-rating .star');
+            for (var i = 0; i < stars.length; i++) {
+                if (i < averageRating) {
+                    stars[i].classList.add('filled');
+                }
+            }
+        });
+
+        // 부분 취소 문구 표시
+        const dateInput = $('input[name="datefilter"]');
+        const partialCancellationElements = document.querySelectorAll('.partial-cancellation');
+
+        dateInput.val(startDate.format('MM.DD') + ' - ' + endDate.format('MM.DD'));
+
+        dateInput.on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('MM.DD') + ' - ' + picker.endDate.format('MM.DD'));
+            $('#check_in').val(picker.startDate.format('YYYY-MM-DD'));
+            $('#check_out').val(picker.endDate.format('YYYY-MM-DD'));
+
+            const checkInDate = new Date(picker.startDate.format('YYYY-MM-DD'));
+            const today = new Date();
+            const timeDifference = checkInDate - today;
+            const dayDifference = timeDifference / (1000 * 3600 * 24);
+
+            if (dayDifference <= 3) {
+                partialCancellationElements.forEach(element => element.style.display = 'block');
+            } else {
+                partialCancellationElements.forEach(element => element.style.display = 'none');
+            }
+        });
+
+        dateInput.on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+            $('#check_in').val('');
+            $('#check_out').val('');
+            partialCancellationElements.forEach(element => element.style.display = 'none');
+        });
+    });
+</script>
+
+
+
+
+</body>
+</html>
