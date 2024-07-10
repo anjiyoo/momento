@@ -70,33 +70,58 @@ class PostDetailView(DetailView):
     template_name = 'post/bae_detail.html'
 
     def get(self, request, pk):
-        # pk에 해당하는 Baenangtalk 객체 가져오기
-        baenangtalk = get_object_or_404(Baenangtalk, pk=pk)
+        baenangtalk = get_object_or_404(Baenangtalk, pk=pk)  # Baenangtalk 객체 가져오기
+        comments = BaenangtalkComment.objects.filter(bae=baenangtalk)  # BaenangtalkComment 객체 가져오기
+        form = CommentcreateForm()  # 댓글 폼 초기화
 
-        # 작성자 닉네임 가져오기 (가정: Baenangtalk 모델에 작성자 정보가 User 외래키로 연결되어 있다고 가정)
-        nickname = baenangtalk.author.username  # User 모델에서 username을 닉네임으로 사용
-
-        # 월 가져오기 
-        period = baenangtalk.period.strftime('%m') 
-
-        # 도시, 주제 가져오기
-        county = baenangtalk.county.city_name
-        subject = baenangtalk.subject.bae_sub_name
-
-        # 템플릿에 전달할 컨텍스트 데이터 정의
+        # 템플릿으로 전달할 data 
         context = {
-            'nickname': nickname,
-            'period': period,
-            'county': county,
-            'subject': subject,
+            'profile': baenangtalk.user.profile,
+            'nickname': baenangtalk.user.username,
+            'period': baenangtalk.period.bae_month,
+            'county': baenangtalk.county.city_name,
+            'subject': baenangtalk.subject.bae_sub_name,
             'bae_title': baenangtalk.bae_title,
+            'bae_img': baenangtalk.bae_img,
             'bae_content': baenangtalk.bae_content,
             'bae_date': baenangtalk.bae_date,
             'bae_like': baenangtalk.bae_like,
-            'comments': baenangtalk.comments.all()  # 댓글 필드가 있는 경우 comments 필드 사용 (예시)
+            'form': form,
+            'comments': comments,
+            'baenangtalk': baenangtalk 
         }
 
         return render(request, self.template_name, context)
+
+    # POST 요청 처리
+    def post(self, request, pk):
+        baenangtalk = get_object_or_404(Baenangtalk, pk=pk)  
+        form = CommentcreateForm(request.POST)
+        # 입력된 데이터 유효성 검사
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.user = request.user  # 요청을 보낸 사용자 = 댓글의 작성자
+            comment.bae = baenangtalk  # 해당 댓글이 속한 게시글 설정
+            comment.save()  # DB 저장
+            return redirect('baenangtalk:bae_detail', pk=pk)
+        else:
+            comments = BaenangtalkComment.objects.filter(bae=baenangtalk)
+            context = {
+                'profile': baenangtalk.user.profile,
+                'nickname': baenangtalk.user.username,
+                'period': baenangtalk.period.bae_month,
+                'county': baenangtalk.county.city_name,
+                'subject': baenangtalk.subject.bae_sub_name,
+                'bae_title': baenangtalk.bae_title,
+                'bae_img': baenangtalk.bae_img,
+                'bae_content': baenangtalk.bae_content,
+                'bae_date': baenangtalk.bae_date,
+                'bae_like': baenangtalk.bae_like,
+                'form': form,
+                'comments': comments,
+                'baenangtalk': baenangtalk 
+            }
+            return render(request, self.template_name, context)
     
 
 # 배낭톡 create
@@ -125,35 +150,32 @@ class PostCreateView(CreateView):
 
 # 배낭톡 edit
 class PostEditView(UpdateView):
-    template_name = 'post/bae_edit.html' 
+    template_name = 'post/bae_edit.html'
 
     def get(self, request, pk):
-        baenangtalk = get_object_or_404(Baenangtalk, pk=pk)  # pk에 해당하는 Baenangtalk 객체 가져오기
+        baenangtalk = get_object_or_404(Baenangtalk, pk=pk)
 
         # 현재 사용자가 작성자인지 확인
-        if baenangtalk.author != request.user:
-            return redirect('baenangtalk_detail', pk=pk)
+        if baenangtalk.user != request.user:
+            return redirect('baenangtalk:bae_detail', pk=pk)
 
-        # 폼 인스턴스 생성 및 기존 데이터로 초기화
         form = BaenangtalkForm(instance=baenangtalk)
-
         return render(request, self.template_name, {'form': form, 'baenangtalk': baenangtalk})
 
     def post(self, request, pk):
-        baenangtalk = get_object_or_404(Baenangtalk, pk=pk)  # pk에 해당하는 Baenangtalk 객체 가져오기
+        baenangtalk = get_object_or_404(Baenangtalk, pk=pk)
 
         # 현재 사용자가 작성자인지 확인
-        if baenangtalk.author != request.user:
-            return redirect('bae_detail', pk=pk)
+        if baenangtalk.user != request.user:
+            return redirect('baenangtalk:bae_detail', pk=pk)
 
         form = BaenangtalkForm(request.POST, request.FILES, instance=baenangtalk)
 
         if form.is_valid():
-            # 폼이 유효하면 데이터 저장
             baenangtalk = form.save()
 
             # 수정 완료 후 리다이렉트
-            return redirect('bae_detail', pk=pk)
+            return redirect('baenangtalk:bae_detail', pk=pk)
 
         # 폼이 유효하지 않으면 다시 폼을 보여줌
         return render(request, self.template_name, {'form': form, 'baenangtalk': baenangtalk})
