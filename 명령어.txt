@@ -8,3 +8,5 @@ python manage.py createsuperuser
   id:admin pw:1
 
 pip install freeze > requirements.txt
+
+pip install psycopg2
