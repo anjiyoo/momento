@@ -157,16 +157,15 @@
                     <small class="text-muted">여행 날짜: {{ review.travel_date }}</small>
                 {% endif %}
             </div>
-            <div class="review-images">
+            <!-- <div class="review-images">
                 {% for image in review.images.all %}
                     <img src="{{MEDIA_URL}}{{ image.image_url }}" alt="Review Image" class="img-thumbnail" style="max-width: 150px; margin: 10px;">
                 {% endfor %}
-            </div>
+            </div> -->
             <div class="uploaded-image">
                 {% if review.image_url %}
                     <img src="{{MEDIA_URL}}{{ review.image_url }}" alt="Uploaded Image" class="img-thumbnail">
                     <hr style="border: 10px solid #f0f0f0; margin-top: 0;">
-
                 {% endif %}
             </div>
             

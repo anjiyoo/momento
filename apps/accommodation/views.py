@@ -241,47 +241,11 @@ class ListReviews(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 from .forms import ReviewForm
-
-# from django.contrib.auth.decorators import login_required
-# from django.utils.decorators import method_decorator
-# @method_decorator(login_required, name='dispatch')
-from django.http import JsonResponse
-# class CreateReview(APIView):
-#     def get(self, request, pk):
-#         accommodation = get_object_or_404(Accommodation, pk=pk)
-#         form = ReviewForm()
-#         return render(request, 'review/create_review.html', {'form': form, 'accommodation': accommodation})
-
-#     def post(self, request, pk):
-#         user = request.user
-        
-#         accommodation = get_object_or_404(Accommodation, pk=pk)
-#         form = ReviewForm(request.POST, request.FILES)
-        
-#         if form.is_valid():
-#             review = form.save(commit=False)
-#             # review.user = user
-#             # review.accommodation = accommodation
-#             # review.save()
-#             if request.user.is_authenticated:
-#                 review.user = request.user  # 현재 로그인된 사용자 할당
-#             else:
-#                 # 익명 사용자를 위한 임시 사용자 객체 생성
-#                 anonymous_user, created = User.objects.get_or_create(username='anonymous_user')
-#                 review.user = anonymous_user
-#             review.accommodation = accommodation
-#             review.save()
-#             return redirect(reverse('review_detail', kwargs={'accommodation_pk': accommodation.pk, 'review_pk': review.pk}))
-#         else:
-#             return render(request, 'review/create_review.html', {'form': form, 'accommodation': accommodation})
-    
         
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.views import View
 from .models import Review
 from .forms import ReviewForm
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 
 class CreateReview(View):
     def get(self, request, pk):
@@ -323,4 +287,37 @@ class ReviewDetailView(APIView):
             'images': accommodation_images,
         }
         return render(request, 'review/review_detail.html', context)
-        # return render(request, 'review/review_detail.html', {'accommodation': accommodation, 'review': review})
+
+
+class ReviewUpdateView(View):
+    def get(self, request, accommodation_pk, review_pk):
+        accommodation = get_object_or_404(Accommodation, pk=accommodation_pk)
+        review = get_object_or_404(Review, pk=review_pk, user=request.user)
+        form = ReviewForm(instance=review)
+        return render(request, 'review/update_review.html', {'form': form, 'accommodation': accommodation})
+
+    def put(self, request, accommodation_pk, review_pk):
+        accommodation = get_object_or_404(Accommodation, pk=accommodation_pk)
+        review = get_object_or_404(Review, pk=review_pk, user=request.user)
+        form = ReviewForm(request.PUT, instance=review)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('review_detail', kwargs={'accommodation_pk': accommodation.pk, 'review_pk': review.pk}))
+        return render(request, 'review/update_review.html', {'form': form, 'accommodation': accommodation})
+
+
+
+from django.http import HttpResponseForbidden
+
+
+class ReviewDeleteView(View):
+    def delete(self, request, accommodation_pk, review_pk):
+        accommodation = get_object_or_404(Accommodation, pk=accommodation_pk)
+        review = get_object_or_404(Review, pk=review_pk, user=request.user)
+
+        # 작성자가 현재 로그인한 사용자와 일치하는지 확인
+        if review.user != request.user:
+            return HttpResponseForbidden("You are not allowed to delete this review.")
+
+        review.delete()
+        return redirect(reverse('accommodation_detail', kwargs={'pk': accommodation.pk}))
