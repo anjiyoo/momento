@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% block content%}
+<style>
+      .trip-planner {
+  padding: 1rem;
+}
+
+.trip-header {
+  margin-bottom: 1rem;
+}
+
+.trip-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.edit-option {
+  font-size: 0.875rem;
+  font-weight: normal;
+}
+
+.trip-date, .trip-type {
+  color: #666;
+}
+
+.main-actions, .secondary-actions, .day-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb;
+}
+
+.btn-secondary {
+  background-color: white;
+  color: #333;
+  border: 1px solid #d1d5db;
+}
+
+.btn-secondary:hover {
+  background-color: #f3f4f6;
+}
+
+.day-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.day-title {
+  font-size: 1.125rem;
+  font-weight: bold;
+}
+
+.day-date {
+  color: #666;
+}
+
+.modal{
+    position:absolute;
+    display:none;
+    
+    justify-content: center;
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100%;
+
+    background-color: rgba(0,0,0,0.4);
+}
+.modal_body{
+    position:absolute;
+    top:50%;  
+
+
+    width:400px;   
+    height:600px; 
+
+    padding:40px;  
+
+    text-align: center;
+
+    background-color: rgb(255,255,255); 
+    border-radius:10px;  
+    box-shadow:0 2px 3px 0 rgba(34,36,38,0.15); 
+
+    transform:translateY(-50%);
+     
+}
+#modalCloseButton{
+    border: none;
+    background-color: white;
+    position:absolute;
+    right: 15px;
+}
+.city_btn{
+    background-color: gainsboro; 
+    border-radius: 20px;
+    font-weight: 900;
+    height: 40px;
+}
+</style>
+<div class="container">
+<div class="trip-planner">
+    <div class="trip-header">
+      <h1 class="trip-title">{{new_trip.city}} 여행<span class="edit-option">편집</span></h1>
+      <p class="trip-date">{{new_trip.start_date|date:"Y.m.d"}} ~ {{new_trip.end_date|date:"Y.m.d"}}</p>
+      <p class="trip-type">{{new_trip.who}} | {%for i in style%}{{i}}{%endfor%}</p>
+    </div>
+    <div class="main-actions">
+      <button class="btn btn-primary">+ 일행과 함께 일정짜기</button>
+      <button class="btn btn-primary">% 셀프 패키지</button>
+    </div>
+    <div class="secondary-actions">
+      <button class="btn btn-secondary">+ 항공편</button>
+      <button class="btn btn-secondary">+ 숙소</button>
+      <button class="btn btn-secondary">체크리스트</button>
+      <button class="btn btn-secondary">가계부</button>
+    </div>
+    {% for day in days %}
+    <div class="day-planner">
+      <div class="day-header">
+        <h2 class="day-title">day {{ forloop.counter}}</h2>
+        <p class="day-date">{{day}}</p>
+      </div>
+      <div class="day-actions">
+        <button class="btn btn-secondary btn-open-modal" data-bs-toggle="modal" data-bs-target="#exampleModal">장소 추가</button>
+        <button class="btn btn-secondary">메모 추가</button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">추천 관광지</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        
+        <p>
+          {% for spot in tour_spots %}
+          <div class="d-flex">
+            <img src="{{spot.image_url}}" alt="" style="height: 50px; width: 50px;">
+            {{spot.title}}
+            <button type="submit" class="btn ms-auto city_btn">선택</button>
+          </div>
+          {% endfor %}
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+  <!-- <div class="modal hidden ">
+    <div class="modal_body">
+        <div class="d-flex" style="justify-content: center;">
+            <div>
+            <h2>추천 장소</h2>
+            </div>
+            <button id="modalCloseButton">x</button>
+        </div>
+         
+        <p>
+          {% for spot in tour_spots %}
+          <div class="d-flex">
+            <img src="{{spot.image_url}}" alt="" style="height: 50px; width: 50px;">
+            {{spot.title}}
+          </div>
+          {% endfor %}
+        </p>
+    </div>
+  </div> -->
+</div>
+<script>
+    const modal = document.querySelector('.modal');
+    const btnOpenModal=document.querySelector('.btn-open-modal');
+    const modalCloseButton = document.getElementById('modalCloseButton');
+    btnOpenModal.addEventListener("click", ()=>{
+        modal.style.display="flex";
+    });
+    modalCloseButton.addEventListener('click', () => {
+        modal.style.display='none';
+});
+</script>
+{% endblock %}

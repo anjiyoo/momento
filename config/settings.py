@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     # 앱경로
     'apps',
     'apps.travel',
+    'plan',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -148,3 +150,17 @@ MEDIA_ROOT = BASE_DIR/'media'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+import os
+import environ
+
+# 환경변수를 불러올 수 있는 상태로 설정
+env = environ.Env(DEBUG=(bool, True))
+
+# 읽어올 환경 변수 파일을 지정
+environ.Env.read_env(
+  env_file = os.path.join(BASE_DIR, '.env')
+)
+
+# 설정한 변수를 읽어옴
+API_KEY = env('API_KEY')
