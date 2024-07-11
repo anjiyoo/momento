@@ -40,9 +40,9 @@ class Baenangtalk(models.Model):
 class BaenangtalkComment(models.Model):
     bae = models.ForeignKey(Baenangtalk, on_delete=models.CASCADE)  # 배낭톡 모델 외부키
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # 유저 모델 외부키
-    bae_com_content = models.CharField('내용', max_length=100)  # 댓글내용
+    bae_com_content = models.CharField(max_length=100)  # 댓글내용
     bae_com_like = models.IntegerField('좋아요', default=0)  # 좋아요
-    bae_com_liked_by = models.ManyToManyField(User, related_name='liked_comments')  # 좋아요를 누른 회원 
+    bae_com_like_by = models.ManyToManyField(User, related_name='liked_comments')  # 좋아요를 누른 회원 
     bae_com_date = models.DateTimeField('작성일', auto_now_add=True)  # 작성일 
 
     def __str__(self):
