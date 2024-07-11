@@ -72,7 +72,7 @@ input, textarea, select {
     margin: 5px;
 }
 
-/* 작성완료 버튼 그림자 */
+/* 작성완료 버튼 hover */
 .submit-button:hover {
     background-color: #87878760;
     transform: translateY(-1px);
