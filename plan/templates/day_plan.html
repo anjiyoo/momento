@@ -112,7 +112,7 @@
     position:absolute;
     right: 15px;
 }
-.city_btn{
+.spot_btn{
     background-color: gainsboro; 
     border-radius: 20px;
     font-weight: 900;
@@ -160,13 +160,15 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        
+        <div id="check-spot" class="d-flex">
+
+        </div>
         <p>
           {% for spot in tour_spots %}
           <div class="d-flex">
             <img src="{{spot.image_url}}" alt="" style="height: 50px; width: 50px;">
             {{spot.title}}
-            <button type="submit" class="btn ms-auto city_btn">선택</button>
+            <button type="submit" class="btn ms-auto spot_btn" data-content-id="{{spot.content_id}}" onclick="addSpot('{{spot.image_url}}', '{{spot.title}}', '{{spot.content_id}}')">선택</button>
           </div>
           {% endfor %}
         </p>
@@ -208,5 +210,22 @@
     modalCloseButton.addEventListener('click', () => {
         modal.style.display='none';
 });
+function addSpot(imageUrl, title, contentId) {
+  const checkSpot = document.getElementById('check-spot');
+  const spotElement = document.createElement('div');
+  spotElement.classList.add('d-flex', 'align-items-center', 'mb-2');
+  spotElement.innerHTML = `
+    <img src="${imageUrl}" alt="" style="height: 30px; width: 30px;">
+    
+    <button type="button" class="btn-close" style='width:10px; height:10px' onclick="removeSpot(this)"></button>
+  `;
+  spotElement.setAttribute('data-content-id', contentId);
+  checkSpot.appendChild(spotElement);
+}
+
+function removeSpot(button) {
+  const spotElement = button.parentElement;
+  spotElement.remove();
+}
 </script>
 {% endblock %}
