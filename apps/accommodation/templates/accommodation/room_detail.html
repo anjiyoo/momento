@@ -87,7 +87,7 @@
     </style>
 </head>
 <body>
-    <a href="{% url 'accommodation_detail' pk=accommodation.pk %}" class="back-button">
+    <a href="{% url 'accommodation:accommodation_detail' pk=accommodation.pk %}" class="back-button">
         <i class="fas fa-arrow-left"></i>
     </a>
     <div class="container mt-4">
@@ -165,8 +165,12 @@
 
 
             <div class="fixed-footer">
-                <a href="{% url 'create_reservation' accommodation_pk=accommodation.pk room_pk=room.pk%}" class="btn btn-primary">예약하기</a>
-            </div>
+                <a href="{% url 'accommodation:create_reservation' accommodation_pk=accommodation.pk room_pk=room.pk%}" class="btn btn-primary">예약하기</a>
+            </div> 
+            <!-- <div class="fixed-footer">
+                <a href="{% url 'accommodation:create_reservation' accommodation_pk=accommodation.pk room_pk=room.pk %}?datefilter={{ request.GET.datefilter }}" class="btn btn-primary">예약하기</a>
+            </div> -->
+            
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>

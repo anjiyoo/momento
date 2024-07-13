@@ -1,5 +1,6 @@
 from django import forms
-from .models import Review
+from .models import Review, Reservation
+from apps.userinfo.models import User
 
 class ReviewForm(forms.ModelForm):
     class Meta:
@@ -17,3 +18,38 @@ class ReviewForm(forms.ModelForm):
                 (5, '5 Stars')
             ]),
         }
+
+from .models import Reservation, ReservationHolderInfo, GuestInfo, TransportationInfo
+
+class ReservationForm(forms.ModelForm):
+    class Meta:
+        model = Reservation
+        fields = ['check_in', 'check_out', 'cancellation_policy_agreed', 'terms_and_conditions_agreed', 'guests_adult', 'guests_child']
+
+
+class ReservationHolderInfoForm(forms.ModelForm):
+    username = forms.CharField(max_length=150)
+    email = forms.EmailField()
+    telnum = forms.CharField(max_length=15)
+
+    class Meta:
+        model = ReservationHolderInfo
+        fields = ['username', 'email', 'telnum']
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(ReservationHolderInfoForm, self).__init__(*args, **kwargs)
+        if user:
+            self.fields['username'].initial = user.username
+            self.fields['email'].initial = user.email
+            self.fields['telnum'].initial = user.telnum  # Assuming telnum is in the User profile
+
+class GuestInfoForm(forms.ModelForm):
+    class Meta:
+        model = GuestInfo
+        fields = ['name', 'birth_date', 'gender']
+
+class TransportationInfoForm(forms.ModelForm):
+    class Meta:
+        model = TransportationInfo
+        fields = ['public_transport', 'walking', 'personal_car']

@@ -24,6 +24,12 @@ class Accommodation(models.Model):
     description = models.TextField(blank=True, null=True)
     like = models.ManyToManyField(User, related_name='like_accommodations', blank=True)
 
+    DOMESTIC_ACCOMMODATION_TYPES = (
+        ('pension_pool_vila', '펜션, 풀빌라'),
+        ('camping_glamping', '캠핑, 글램핑'),
+        ('boutique_motel', '부티크 모텔'),
+    )
+
 
 
 # 숙소 이미지를 저장할 모델
@@ -55,7 +61,7 @@ class ReservationHolderInfo(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.username} - {self.email}"
+        return f"{self.user.username} - {self.user.email}"
 
 # 예약 페이지에서 작성할 투숙자 정보 모델
 class GuestInfo(models.Model):
@@ -71,14 +77,6 @@ class TransportationInfo(models.Model):
     personal_car = models.BooleanField(default=False)
 
 
-# # 예약 페이지에서 작성할 결제 내역 모델
-# class PaymentDetail(models.Model):
-#     reservation_amount = models.DecimalField(max_digits=10, decimal_places=2)
-#     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    
-# 사용자가 숙소를 예약할 떄 사용할 모델
-# ForeignKey를 사용하여 User와 Accommodation 모델을 참조
-# 사용자, 예약한 숙소, 예약 날짜 등의 정보를 저장
 class Reservation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     accommodation = models.ForeignKey(Accommodation, on_delete=models.CASCADE)
@@ -93,7 +91,8 @@ class Reservation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True) 
     reservation_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    guests = models.PositiveIntegerField(default=1)  # 인원수 필드 
+    guests_adult = models.PositiveIntegerField(default=2)  # 성인 인원수 필드
+    guests_child = models.PositiveIntegerField(default=0)  # 아동 인원수 필드
 
     def __str__(self):
         return f"{self.user.username} - {self.accommodation.name}"
@@ -108,7 +107,7 @@ class Review(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     rating = models.IntegerField(choices=[(1, '1 Star'), (2, '2 Stars'), (3, '3 Stars'), (4, '4 Stars'), (5, '5 Stars')], default=5)
     image_url = models.ImageField(upload_to='review', blank=True)
-    travel_date = models.CharField(max_length=7,null=True, blank=True)
+    travel_date = models.CharField(max_length=10,null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.accommodation.name}"

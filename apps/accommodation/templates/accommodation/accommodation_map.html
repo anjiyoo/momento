@@ -97,7 +97,7 @@
          style="float: left; margin-right: 20px; margin-top: 20px; margin-left: 10px; width: 100px; height: auto;">
     {% endif %}
         <h2 style="font-size: 18px;">
-            <a href="{% url 'accommodation_detail' pk=accommodation.pk %}" style="text-decoration: none; color: inherit;">
+            <a href="{% url 'accommodation:accommodation_detail' pk=accommodation.pk %}" style="text-decoration: none; color: inherit;">
                 {{ accommodation.name }}
             </a>
         </h2>

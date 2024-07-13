@@ -1,22 +1,9 @@
+{% extends 'base.html' %}
+
 {% load humanize %}
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ accommodation.name }} 상세 정보</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+{% block title %}Accommodation Detail{% endblock %}
+{% block content %}
   
-
-     
     <style>
         .container {
             max-width: 800px; /* 최대 너비 설정 */
@@ -286,7 +273,7 @@
             align-items: center;
         }
         .center-button button {
-            background-color: #007bff; /* 파란색 */
+            background-color: #ffffff; /* 파란색 */
             color: white;
             border: none;
             padding: 10px 20px;
@@ -311,8 +298,68 @@
             height: 100%;
             object-fit: cover;
         }
+        .reviews-header {
+            display: flex;
+            align-items: center;
+        }
+        .reviews-header h5 {
+            margin-left: 30px;
+            font-weight: bold;
+        }
+        .reviews-header .reviews-count {
+            margin-left: 5px;
+            margin-bottom: 10px;
+            color:#007bff;
+            font-size: 20px;
+            font-weight: bold;
 
+        }
+        .star-ratingg {
+            font-size: 1em;
+            color: #f5b301;
+            margin: 20px 20px;
+        }
+        .dropdown-content {
+            width: 150px; /* 드롭다운 메뉴의 너비 조정 */
+            padding: 5px; /* 드롭다운 메뉴의 패딩 조정 */
+            box-shadow: none !important;
+            border: gray !important;
+        }
 
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            box-shadow: none;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+            box-shadow: none;
+        }
+        .custom-dropdown-button {
+            background-color: white; /* 버튼 배경색 변경 */
+            color: gray; /* 버튼 텍스트 색상 변경 */
+            border: none; /* 버튼 테두리 제거 */
+            border-radius: 4px; /* 버튼 모서리 둥글게 */
+            padding: 5px 15px; /* 버튼 패딩 조정 */
+            font-size: 15px; /* 버튼 폰트 크기 조정 */
+            cursor: pointer; /* 커서 모양 변경 */
+            transition: background-color 0.3s ease; /* 배경색 전환 효과 추가 */
+            margin-left:5px;
+}
+
+        .custom-dropdown-button:hover {
+            background-color: #b0b0b1; /* 버튼 호버 시 배경색 변경 */
+        }
+        .custom-dropdown-button:active {
+        background-color: white; /* 버튼 눌렀을 때 배경색 변경 */
+        }
+
+        .custom-dropdown-button i {
+            margin-right: 5px; /* 아이콘과 텍스트 사이 간격 조정 */
+        }
     </style>
 </head>
 
@@ -361,10 +408,11 @@
             <span class="star">&#9733;</span>
             <span class="star">&#9733;</span>
         </div>
+    
         <!-- 리뷰 수  -->
         <p style= "margin-top: 15px;">{{ reviews_count }}</p>
         
-        <a href="{% url 'map' pk=accommodation.pk %}" style="margin-left: 8px; color: blue; text-decoration: none;">리뷰 보기 ></a>
+        <a  style="margin-left: 8px; color: blue; text-decoration: none;" onclick="scrollToReviews()">리뷰 보기 ></a>
 
         <!-- 리뷰 끝 -->
     </div>
@@ -372,7 +420,7 @@
     <div style="display: flex; align-items: center; margin-left:70px">
         <i class="bi bi-geo-alt-fill"></i>
         <p style="margin-left: 10px; margin-top: 15px;">{{ accommodation.city.city_name }}</p>
-        <a href="{% url 'map' pk=accommodation.pk %}" style="margin-left: 8px; color: blue;text-decoration: none;">지도 보기 ></a>
+        <a href="{% url 'accommodation:map' pk=accommodation.pk %}" style="margin-left: 8px; color: blue;text-decoration: none;">지도 보기 ></a>
     </div>
 
     <!-- 구분선 -->
@@ -395,12 +443,14 @@
             <i class="bi bi-calendar-plus" style="display: block; font-size: 24px;"></i>
             <span>일정추가</span>
         </div>
-        <a href="{% url 'create_review' accommodation.pk %}" style="text-decoration: none; color: inherit;">
-            <div style="text-align: center;">
-                <i class="bi bi-star" style="display: block; font-size: 24px;"></i>
-                <span>리뷰쓰기</span>
-            </div>
-        </a>
+
+            <a href="{% url 'accommodation:create_review' accommodation.pk %}" style="text-decoration: none; color: inherit;">
+                <div style="text-align: center;">
+                    <i class="bi bi-star" style="display: block; font-size: 24px;"></i>
+                    <span>리뷰 쓰기</span>
+                </div>
+            </a>
+
     </div>
 
     <!-- 구분선 -->
@@ -409,6 +459,7 @@
     <!-- 최저가 예약 / 객실 중 제일 싼 가격 띄우기 -->
 
     <h2 style="font-weight: bold; margin-left: 50px; margin-top: 40px;">최저가 예약</h2>
+
         {% csrf_token %}
         <div style="text-align: center;">
                 <input type="text" 
@@ -424,8 +475,7 @@
                        style="margin-left: 10px; height: 38px; text-align: center; font-size: 16px; width: 200px;"  
                        placeholder="성인 2" readonly onclick="openGuestModal()"/>           
             </div>
-    </form>
-
+   
              <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 70px;">
                 <div style="margin-left: 150px;">
                     <div style="font-size: 15px; font-weight: bold; color: rgb(94, 189, 131); font-family: 'Roboto', sans-serif;">MOMENTO</div>
@@ -530,7 +580,9 @@
                     {{ room.price|floatformat:0| intcomma}}원
                 </p>
 
-                <a href="{% url 'room_detail' accommodation_pk=accommodation.pk room_pk=room.pk %}" id="selectButton" class="btn btn-primary mt-4 select-button"->선택</a>
+                <!-- <a href="{% url 'accommodation:room_detail' accommodation_pk=accommodation.pk room_pk=room.pk %}" id="selectButton" class="btn btn-primary mt-4 select-button"->선택</a> -->
+                <a href="{% url 'accommodation:room_detail' accommodation_pk=accommodation.pk room_pk=room.pk %}?datefilter={{ request.GET.datefilter }}" class="btn btn-primary mt-4 select-button">선택</a>
+
             </div>
     
             <hr class="breakfastRoomsSeparator" style="border: 0; border-top: 1px solid #ccc; margin: 20px 0;">
@@ -555,10 +607,165 @@
     <div id="noFreeCancellationRoomsMessage" class="card" style="display: none; text-align:center;">
         <p>무료 취소 가능한 숙소가 없습니다.</p>
     </div>
+
+
 </div>
+<!-- <hr style="border: 0; border-top: 20px solid #e7e7e7d8; margin: 30px 0;"> -->
+
+<div class="container">
+    <div class="reviews-header"  id="reviewsSection">
+        <h5>리뷰</h5>
+        <span class="reviews-count">{{ reviews_count }}</span>
+    </div>
+    {% if reviews %}
+        <ul>
+            {% for review in reviews %}
+                <li style="list-style: none; margin-bottom: 20px;">
+                    <div style="border: 1px solid #e7e7e7; border-radius: 10px; padding: 15px; box-shadow: none; border: none; position: relative;">
+                        <div style="display: flex; align-items: center;">
+                            <img src="{{ MEDIA_URL }}{{ review.user.profile }}" alt="{{ review.user.username }}" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px;">
+                            <div>
+                                <p style="margin: 0; font-size: 15px; font-weight: bold;">{{ review.user.username }}</p>
+                                <p style="margin: 0; font-size: 0.8em; color: #909090;">{{ review.user.review_set.count }}개의 리뷰</p>
+                            </div>
+                        </div>
+                        <div style="margin-top: 10px; display: flex; align-items: center;">
+                            <div class="star-ratingg">
+                                {% for i in "12345" %}
+                                    {% if i|add:0 <= review.rating %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% if review.travel_date %}
+                                <div style="font-size: 1em; color: #909090;">
+                                    {{ review.travel_date }} 여행
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <span>{{ review.content }}</span>
+                        </div>
+                        {% if review.image_url %}
+                            <div style="margin-top: 10px;">
+                                <img src="{{ MEDIA_URL }}{{ review.image_url }}" alt="Review Image" style="max-width: 100%; border-radius: 10px;">
+                            </div>
+                        {% endif %}
+                        <div style="position: absolute; right: 15px; font-size: 0.8em; color: #909090; margin-right:30px; margin-top:10px;">
+                            {{ review.created_at }}
+                            <div class="dropdown" style="display: inline-block; position: relative;">
+                                <button class="btn btn-secondary dropdown-toggle custom-dropdown-button" type="button" id="dropdownMenuButton" aria-expanded="false" onclick="toggleMenu(this)">
+                                    <i class="bi bi-three-dots"></i>
+                                </button>
+                                <div class="dropdown-content" style="display: none; position: absolute; right: 0; background-color: white; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1;">
+                                    {% if user == review.user %}
+                                        <a href="{% url 'accommodation:update_review' accommodation.pk review.pk %}">수정하기</a>
+                                        <a onclick="deleteReview({{ review.pk }}, {{ accommodation.pk }})">삭제하기</a>
+                                    {% else %}
+                                        <a href="#" onclick="reportReview({{ review.id }})">신고하기</a>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+                            
+                        </div>
+                    </div>
+    <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 20px;">
+
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p style="text-align: center; margin: 20px 0 font-weight: bold;">아직 작성된 리뷰가 없습니다. </p>
+    {% endif %}
 </div>
 
+ <!-- jQuery 라이브러리 로드 -->
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ <!-- Moment.js 및 DateRangePicker 라이브러리 로드 -->
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+ <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
 <script>
+    $(document).ready(function() {
+        var startDate = moment();
+    var endDate = moment().add(1, 'days');
+
+    $('input[name="datefilter"]').daterangepicker({
+        autoUpdateInput: false,
+        minDate: moment(),
+        startDate: startDate,
+        endDate: endDate,
+        locale: {
+            format: 'MM.DD',
+            cancelLabel: 'Clear'
+        }
+    });
+
+
+    $('input[name="datefilter"]').val(startDate.format('MM.DD') + ' - ' + endDate.format('MM.DD'));
+
+    $('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('MM.DD') + ' - ' + picker.endDate.format('MM.DD'));
+        $('#check_in').val(picker.startDate.format('YYYY-MM-DD'));
+        $('#check_out').val(picker.endDate.format('YYYY-MM-DD'));
+    });
+
+    $('input[name="datefilter"]').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+        $('#check_in').val('');
+        $('#check_out').val('');
+    });
+    });
+   
+        
+
+       
+
+    function deleteReview(reviewId, accommodationId) {
+        if (confirm("정말로 이 리뷰를 삭제하시겠습니까?")) {
+            fetch(`/accommodation/detail/${accommodationId}/review/${reviewId}/delete/`, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert("리뷰 삭제에 실패했습니다.");
+                }
+            });
+        }
+    }
+    function scrollToReviews() {
+        var reviewsSection = document.getElementById("reviewsSection");
+        reviewsSection.scrollIntoView({ behavior: "smooth" });
+    }
+    function toggleMenu(button) {
+        var dropdownContent = button.nextElementSibling;
+        if (dropdownContent.style.display === "none" || dropdownContent.style.display === "") {
+            dropdownContent.style.display = "block";
+        } else {
+            dropdownContent.style.display = "none";
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+            const averageRating = Math.floor(parseFloat("{{ average_rating|default:0 }}")); // 소수점 이하 제거
+
+            const starRating = document.getElementById('star-rating');
+            const stars = starRating.getElementsByClassName('star');
+
+            for (let i = 0; i < stars.length; i++) {
+                if (i < averageRating) {
+                    stars[i].classList.add('filled'); // 평균 별점만큼 별 색칠
+                } else {
+                    stars[i].classList.remove('filled'); // 나머지는 색칠하지 않음
+                }
+            }
+        });
+
     // 게스트 수 모달
     function openGuestModal() {
             document.getElementById('guestModal').style.display = 'block';
@@ -688,47 +895,7 @@
             showImage(currentIndex);
         });
 
-        // 날짜 선택 기능
-        var startDate = moment();
-        var endDate = moment().add(1, 'days');
 
-        $('input[name="datefilter"]').daterangepicker({
-            autoUpdateInput: false,
-            minDate: moment(),
-            startDate: startDate,
-            endDate: endDate,
-            locale: {
-                format: 'MM.DD',
-                cancelLabel: 'Clear'
-            }
-        });
-
-        $('input[name="datefilter"]').val(startDate.format('MM.DD') + ' - ' + endDate.format('MM.DD'));
-
-        $('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {
-            $(this).val(picker.startDate.format('MM.DD') + ' - ' + picker.endDate.format('MM.DD'));
-            $('#check_in').val(picker.startDate.format('YYYY-MM-DD'));
-            $('#check_out').val(picker.endDate.format('YYYY-MM-DD'));
-        });
-
-        $('input[name="datefilter"]').on('cancel.daterangepicker', function(ev, picker) {
-            $(this).val('');
-            $('#check_in').val('');
-            $('#check_out').val('');
-        });
-
-        
-
-        // 평균 평점 표시
-        document.addEventListener('DOMContentLoaded', function() {
-            var averageRating = {{ average_rating }};
-            var stars = document.querySelectorAll('#star-rating .star');
-            for (var i = 0; i < stars.length; i++) {
-                if (i < averageRating) {
-                    stars[i].classList.add('filled');
-                }
-            }
-        });
 
         // 부분 취소 문구 표시
         const dateInput = $('input[name="datefilter"]');
@@ -761,9 +928,4 @@
         });
     });
 </script>
-
-
-
-
-</body>
-</html>
+{% endblock %}
