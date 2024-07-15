@@ -360,6 +360,21 @@
         .custom-dropdown-button i {
             margin-right: 5px; /* 아이콘과 텍스트 사이 간격 조정 */
         }
+        .heart {
+        color: black; /* 기본 하트 색 */
+        }
+        .heart-fill {
+            color: red; /* 좋아요 상태일 때 하트 색 */
+ 
+        }
+        .button-save {
+            background-color: white; /* 기본 버튼 배경 */
+            padding: 5px 10px; /* 버튼 패딩 */
+            cursor: pointer;
+        }
+        .button-cancel {
+            color: black; /* 텍스트 색 */
+        }
     </style>
 </head>
 
@@ -387,7 +402,7 @@
         </div>
 
         <!-- 숙소 이름 -->
-        <h1 style="margin-left: 70px; margin-top: 30px;">{{ accommodation.name }}</h1>
+        <h1 style="margin-left: 70px; margin-top: 30px; font-weight: bold;">{{ accommodation.name }}</h1>
 
         <!-- 저장 수 -->
         <div style="display: flex; align-items: center; margin-left: 70px;">
@@ -427,18 +442,15 @@
     <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 50px;">
 
     <!-- 버튼들 -->
-    <div class="d-flex justify-content-center gap-2 mt-3"  style="display: flex; justify-content: center; gap: 150px;">
-        {% if liked %}
+    <div class="d-flex justify-content-center"  style="display: flex; justify-content: center; gap: 150px;">
         <div style="text-align: center;">
-            <i class="bi bi-heart-fill" id="save-button" style="display: block; font-size: 24px; cursor: pointer;"></i>
-            <span id="save-text">저장취소</span>
+            <i class="bi bi-heart {% if is_liked %}heart-fill{% else %}heart{% endif %}" id="save-button" style="display: block; font-size: 24px; cursor: pointer;"></i>
+            <!-- <i class="bi {% if is_liked %}bi-heart-fill{% else %}bi-heart{% endif %}" id="save-button" style="display: block; font-size: 24px; cursor: pointer;"></i> -->
+            <span id="save-text" class="{% if is_liked %}button-cancel{% else %}button-save{% endif %}">
+                {% if is_liked %}저장취소{% else %}저장하기{% endif %}
+            </span>
         </div>
-        {% else %}
-        <div style="text-align: center;">
-            <i class="bi bi-heart" id="save-button" style="display: block; font-size: 24px; cursor: pointer;"></i>
-            <span id="save-text">저장하기</span>
-        </div>
-        {% endif %}
+
         <div style="text-align: center;">
             <i class="bi bi-calendar-plus" style="display: block; font-size: 24px;"></i>
             <span>일정추가</span>
@@ -548,65 +560,73 @@
     </div>
     
     <!-- 객실 목록 -->
-<div id="rooms">
-<div id="roomsList" style="margin-left: 50px;">
-    {% for room in accommodation.rooms.all %}
-    <div id="room-{{ room.id }}" class="room">
-    <div class="room-item" data-free-cancellation="{{ room.is_free_cancellation }}" data-include-breakfast="{{ room.includes_breakfast }}">
-        <div class="room-details">
-                <div class="room-info-card">
-                    <h3>{{ room.name }}</h3>
-                    <p>
-                        <i class="bi bi-person"></i> 최대 {{ room.capacity }}인
-                    </p>
-                    <p class="partial-cancellation" style="display: none; color: rgb(0, 113, 218);">
-                        부분 환불
-                    </p>
-                    
-                    {% if room_images %}
-                        {% for image in room_images %}
-                        <img src="{{MEDIA_URL}}{{image.images}}" alt="{{ room.name }}" class="room-image">
-                        {% endfor %}
-                    {% endif %} 
-                
-                </div>
-
-            <div class="room-card">
-                
-                <p>
-                    <i class="bi bi-person"></i> 2인 기준/ 최대 {{ room.capacity }}인
-                </p>
-                <p style="font-size: 1.5em; font-weight: bold;">
-                    {{ room.price|floatformat:0| intcomma}}원
-                </p>
-
-                <!-- <a href="{% url 'accommodation:room_detail' accommodation_pk=accommodation.pk room_pk=room.pk %}" id="selectButton" class="btn btn-primary mt-4 select-button"->선택</a> -->
-                <a href="{% url 'accommodation:room_detail' accommodation_pk=accommodation.pk room_pk=room.pk %}?datefilter={{ request.GET.datefilter }}" class="btn btn-primary mt-4 select-button">선택</a>
-
-            </div>
+    <div id="rooms">
+        <div id="roomsList" style="margin-left: 50px;">
+            {% if accommodation.rooms.all %}
+                {% for room in accommodation.rooms.all %}
+                    <div id="room-{{ room.id }}" class="room">
+                        <div class="room-item" data-free-cancellation="{{ room.is_free_cancellation }}" data-include-breakfast="{{ room.includes_breakfast }}">
+                            <div class="room-details">
+                                <div class="room-info-card">
+                                    <h3>{{ room.name }}</h3>
+                                    <p>
+                                        <i class="bi bi-person"></i> 최대 {{ room.capacity }}인
+                                    </p>
+                                    <p class="partial-cancellation" style="display: none; color: rgb(0, 113, 218);">
+                                        부분 환불
+                                    </p>
+                                    
+                                    {% if room_images %}
+                                        {% for image in room_images %}
+                                            <img src="{{MEDIA_URL}}{{image.images}}" alt="{{ room.name }}" class="room-image">
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
     
-            <hr class="breakfastRoomsSeparator" style="border: 0; border-top: 1px solid #ccc; margin: 20px 0;">
-
+                                <div class="room-card">
+                                    <p>
+                                        <i class="bi bi-person"></i> 2인 기준/ 최대 {{ room.capacity }}인
+                                    </p>
+                                    <p style="font-size: 1.5em; font-weight: bold;">
+                                        {{ room.price|floatformat:0| intcomma}}원
+                                    </p>
+                                    <a href="{% url 'accommodation:room_detail' accommodation_pk=accommodation.pk room_pk=room.pk %}" class="btn btn-primary mt-4 select-button">선택</a>
+                                </div>
+                                <hr class="breakfastRoomsSeparator" style="border: 0; border-top: 1px solid #ccc; margin: 20px 0;">
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="card" style=" text-align:center; margin-bottom: 50px; margin-top: 30px;">
+                    <p>현재 예약 가능한 방이 없습니다.</p>
+                </div>
+            {% endif %}
         </div>
-      
     </div>
-
-    {% endfor %}
-
-</div>
-</div>
-    <div id="noBothConditionsRoomsMessage" class="card" style="display:none; text-align:center;">
+    <div id="noBothConditionsRoomsMessage" class="card" style="display:none; text-align:center; margin-bottom: 50px;">
         조식 포함, 무료 취소 가능한 숙소가 없습니다.
     </div>
 
-    <div id="noBreakfastRoomsMessage" class="card" style="display: none; text-align:center;">
+    <div id="noBreakfastRoomsMessage" class="card" style="display: none; text-align:center;  margin-bottom: 50px;">
         <p>조식 포함된 객실이 없습니다.</p>
     </div>
 
         
-    <div id="noFreeCancellationRoomsMessage" class="card" style="display: none; text-align:center;">
+    <div id="noFreeCancellationRoomsMessage" class="card" style="display: none; text-align:center; margin-bottom: 50px;">
         <p>무료 취소 가능한 숙소가 없습니다.</p>
     </div>
+
+    <h1>예약 가능한 객실 목록</h1>
+    {% if available_rooms %}
+        <ul>
+            {% for room in available_rooms %}
+                <li>객실 번호: {{ room.number }}, 객실 유형: {{ room.type }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>예약 가능한 객실이 없습니다.</p>
+    {% endif %}
 
 
 </div>
@@ -661,7 +681,7 @@
                                 </button>
                                 <div class="dropdown-content" style="display: none; position: absolute; right: 0; background-color: white; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1;">
                                     {% if user == review.user %}
-                                        <a href="{% url 'accommodation:update_review' accommodation.pk review.pk %}">수정하기</a>
+                                        <a href="{% url 'accommodation:update_review' accommodation_pk=accommodation.pk review_pk=review.pk %}">수정하기</a>
                                         <a onclick="deleteReview({{ review.pk }}, {{ accommodation.pk }})">삭제하기</a>
                                     {% else %}
                                         <a href="#" onclick="reportReview({{ review.id }})">신고하기</a>
@@ -690,9 +710,47 @@
  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    function scrollToReviews() {
+        var reviewsSection = document.getElementById("reviewsSection");
+        reviewsSection.scrollIntoView({ behavior: "smooth" });
+    }
+    // 최저가 방으로 스크롤
+    function scrollToRoom() {
+            var roomId = document.getElementById('lowest_price').getAttribute('data-cheapest-room-id');
+            var roomElement = document.getElementById('room-' + roomId);
+            if (roomElement) {
+                roomElement.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    function toggleMenu(button) {
+        var dropdownContent = button.nextElementSibling;
+        if (dropdownContent.style.display === "none" || dropdownContent.style.display === "") {
+            dropdownContent.style.display = "block";
+        } else {
+            dropdownContent.style.display = "none";
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+            const averageRating = Math.floor(parseFloat("{{ average_rating|default:0 }}")); // 소수점 이하 제거
+
+            const starRating = document.getElementById('star-rating');
+            const stars = starRating.getElementsByClassName('star');
+
+            for (let i = 0; i < stars.length; i++) {
+                if (i < averageRating) {
+                    stars[i].classList.add('filled'); // 평균 별점만큼 별 색칠
+                } else {
+                    stars[i].classList.remove('filled'); // 나머지는 색칠하지 않음
+                }
+            }
+        });
+        
+        
+    
     $(document).ready(function() {
         var startDate = moment();
-    var endDate = moment().add(1, 'days');
+        var endDate = moment().add(1, 'days');
 
     $('input[name="datefilter"]').daterangepicker({
         autoUpdateInput: false,
@@ -719,11 +777,8 @@
         $('#check_in').val('');
         $('#check_out').val('');
     });
-    });
-   
-        
 
-       
+   
 
     function deleteReview(reviewId, accommodationId) {
         if (confirm("정말로 이 리뷰를 삭제하시겠습니까?")) {
@@ -739,33 +794,9 @@
             });
         }
     }
-    function scrollToReviews() {
-        var reviewsSection = document.getElementById("reviewsSection");
-        reviewsSection.scrollIntoView({ behavior: "smooth" });
-    }
-    function toggleMenu(button) {
-        var dropdownContent = button.nextElementSibling;
-        if (dropdownContent.style.display === "none" || dropdownContent.style.display === "") {
-            dropdownContent.style.display = "block";
-        } else {
-            dropdownContent.style.display = "none";
-        }
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-            const averageRating = Math.floor(parseFloat("{{ average_rating|default:0 }}")); // 소수점 이하 제거
-
-            const starRating = document.getElementById('star-rating');
-            const stars = starRating.getElementsByClassName('star');
-
-            for (let i = 0; i < stars.length; i++) {
-                if (i < averageRating) {
-                    stars[i].classList.add('filled'); // 평균 별점만큼 별 색칠
-                } else {
-                    stars[i].classList.remove('filled'); // 나머지는 색칠하지 않음
-                }
-            }
-        });
-
+    
+    
+    
     // 게스트 수 모달
     function openGuestModal() {
             document.getElementById('guestModal').style.display = 'block';
@@ -796,15 +827,7 @@
             }
         }
 
-        // 최저가 방으로 스크롤
-        function scrollToRoom() {
-            var roomId = document.getElementById('lowest_price').getAttribute('data-cheapest-room-id');
-            var roomElement = document.getElementById('room-' + roomId);
-            if (roomElement) {
-                roomElement.scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-    $(document).ready(function() {
+        
         // 버튼 클릭 이벤트 핸들러
         $('#includeBreakfastRoomsBtn, #freeCancellationRoomsBtn').click(function() {
             $(this).toggleClass('active');
@@ -868,10 +891,25 @@
                 }
             });
 
-            $('#noBothConditionsRoomsMessage').toggle(showBreakfast && showFreeCancellation && !hasBothConditionsRooms);
-            $('#noBreakfastRoomsMessage').toggle(showBreakfast && !hasBreakfastRooms);
-            $('#noFreeCancellationRoomsMessage').toggle(showFreeCancellation && !hasFreeCancellationRooms);
-        }
+           
+            if (showBreakfast && showFreeCancellation && !hasBothConditionsRooms) {
+                $('#noBothConditionsRoomsMessage').show();
+                $('#noBreakfastRoomsMessage').hide();
+                $('#noFreeCancellationRoomsMessage').hide();
+            } else {
+                $('#noBothConditionsRoomsMessage').hide();
+                if (showBreakfast && !hasBreakfastRooms) {
+                    $('#noBreakfastRoomsMessage').show();
+                } else {
+                    $('#noBreakfastRoomsMessage').hide();
+                }
+                if (showFreeCancellation && !hasFreeCancellationRooms) {
+                    $('#noFreeCancellationRoomsMessage').show();
+                } else {
+                    $('#noFreeCancellationRoomsMessage').hide();
+                }
+            }
+                    }
 
         // 이미지 전환 기능
         var currentIndex = 0;
@@ -926,6 +964,95 @@
             $('#check_out').val('');
             partialCancellationElements.forEach(element => element.style.display = 'none');
         });
+
+
+    document.getElementById('save-button').addEventListener('click', function() {
+        var isLiked = this.classList.contains('heart-fill');
+        var url = isLiked ? '/accommodation/detail/{{ accommodation.pk }}/unlike/' : '/accommodation/detail/{{ accommodation.pk }}/like/';
+    
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 'accommodationId': '{{ accommodation.pk }}' })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'ok') {
+                if (isLiked) {
+                    // 좋아요 취소 처리
+                    this.classList.remove('heart-fill');
+                    document.getElementById('save-text').textContent = '저장하기';
+                    document.getElementById('save-text').className = 'button-save';
+                } else {
+                    // 좋아요 처리
+                    this.classList.add('heart-fill');
+                    document.getElementById('save-text').textContent = '저장취소';
+                    document.getElementById('save-text').className = 'button-cancel';
+                }
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
     });
+    document.addEventListener('DOMContentLoaded', function() {
+    const likeContainer = document.querySelector('.like-container');
+    likeContainer.addEventListener('click', function() {
+        const accommodationId = this.dataset.accommodationId; // 숙소 ID를 data 속성에서 가져옴
+        let action = likeContainer.classList.contains('liked') ? 'unlike' : 'like'; // 좋아요 상태에 따라 액션 결정
+
+        fetch(`/accommodations/${accommodationId}/${action}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'), // CSRF 토큰 추가
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.status === 'ok') {
+                const likeCountElement = document.querySelector('.like-count');
+                let likesCount = parseInt(likeCountElement.innerText);
+                if(action === 'like') {
+                    likesCount++;
+                    likeContainer.classList.add('liked');
+                } else {
+                    likesCount--;
+                    likeContainer.classList.remove('liked');
+                }
+                likeCountElement.innerText = likesCount; // 좋아요 개수 업데이트
+            } else {
+                // 사용자에게 에러 메시지 표시 (예시)
+                alert('An error occurred. Please try again.');
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            // 사용자에게 에러 메시지 표시 (예시)
+            alert('An error occurred. Please try again.');
+        });
+    });
+
+    // CSRF 토큰 가져오는 함수
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+
+        });
+
 </script>
 {% endblock %}

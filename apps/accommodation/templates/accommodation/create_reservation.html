@@ -13,6 +13,7 @@
             background-color: #ffffff; /* 박스 배경색 */
             border-radius: 10px; /* 모서리 둥글게 */
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* 그림자 */
+    
     }
     .center-container {
         text-align: center;
@@ -133,11 +134,11 @@
         }
         .gender-container {
             display: flex;
-            gap: 10px;
+            gap: 0px;
         }
 
         .gender-button {
-            padding: 10px 20px;
+            padding: 7px 20px;
             border: 1px solid #ccc;
             border-radius: 5px;
             cursor: pointer;
@@ -145,8 +146,8 @@
         }
 
         .gender-button.selected {
-            background-color: #007bff;
-            color: white;
+            background-color: #ffffff;
+            color: #007bff;
             border-color: #007bff;
         }
         .custom-input {
@@ -259,14 +260,22 @@
         /* width: 80%; */
 
     }
+    .form-control::placeholder {
+        color: gray; /* 원하는 색상으로 변경 */
+        opacity: 1; /* IE에서의 투명도 문제를 해결하기 위해 */
+    }
 
 
 
 
 </style>
 <div class="container mt-4">
-        <h1 style="margin-left: 40px">{{ accommodation.name }}</h1>
-        <p style="margin-left: 40px">{{ accommodation.city.city_name }}</p>
+        <h1 style="padding: 30px 30px; font-weight: bold;">{{ accommodation.name }}</h1>
+        <div style="display: flex; margin-left: 40px; color: gray;">
+            <i class="bi bi-geo-alt-fill"></i>
+            <p style="margin-left: 10px;">{{ accommodation.city.city_name }}</p>
+            <p style="margin-left: 3px;">{{ accommodation.city.first_town_name }}</p>
+        </div>
         {% if accommodation_image %}
             <img src="{{ MEDIA_URL }}{{ accommodation_image.images }}" class="d-block w-100" alt="Accommodation Image" style="height: 80px; border-radius: 8px;">
         {% endif %}
@@ -318,7 +327,6 @@
     
           <hr style="border: 0; border-top: 20px solid #9c9c9cd8; margin: 30px 0;">
           <div class="form-group" style="margin-top: 20px; display: flex; align-items: center; justify-content: center;">
-            <!-- <label for="datefilter">예약 기간:</label> -->
             <input type="text" 
                    name="datefilter" 
                    class="daterange custom-input" 
@@ -345,12 +353,12 @@
 
                 <div class="form-group" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
                     <label for="adultCount">성인:</label>
-                    <input type="number" id="adultCount" name="adultCount" class="styled-input" min="1" max="10" value="2">
+                    <input type="number" id="adultCount" name="guests_adult" class="styled-input" min="1" max="10" value="2">
                 </div>
                 <br>
                 <div class="form-group" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
                     <label for="childCount">아동:</label>
-                    <input type="number" id="childCount" name="childCount" class="styled-input" min="0" max="10" value="0">
+                    <input type="number" id="childCount" name="guests_child" class="styled-input" min="0" max="10" value="0">
                 </div>
 
                 <hr style="border: 0; border-top: 2px solid #9c9c9cd8; margin: 30px 0;">
@@ -360,12 +368,6 @@
                 </div>
             </div>
         </div>
-
-        <input type="hidden" id="guests_adult" name="guests_adult" value="{{ reservation_form.guests_adult.value }}">
-        <input type="hidden" id="guests_child" name="guests_child" value="{{ reservation_form.guests_child.value }}">
-        <input type="hidden" id="hiddenAdultCount" name="hiddenAdultCount" value="{{ reservation_form.guests_adult.value }}">
-        <input type="hidden" id="hiddenChildCount" name="hiddenChildCount" value="{{ reservation_form.guests_child.value }}">
-           
                    
 
     <div style="margin-left: 40px; margin-right: 40px;" >
@@ -384,7 +386,7 @@
         <!-- Telnum -->
         <div class="form-group"  style="margin-top: 20px;"s>
             <label for="telnum">전화번호:</label>
-            <input type="tel" id="telnum" name="telnum" class="form-control">
+            <input type="tel" id="telnum" name="telnum" class="form-control" placeholder=" '-' 제외하고 입력">
         </div>
     </div>
 
@@ -394,12 +396,12 @@
         <h2>투숙객 정보</h2>
         <div class="form-group"  style="margin-top: 20px;">
             <label for="name">이름:</label>
-            <input type="text" id="name" name="name" class="form-control" >
+            <input type="text" id="name" name="name" class="form-control" placeholder="홍길동">
         </div>
         <div class="form-group" style="margin-top: 20px; display: flex; gap: 20px;">
             <div style="flex: 1;">
                 <label for="birth_date">생년월일:</label>
-                <input type="date" id="birth_date" name="birth_date" class="form-control">
+                <input type="text" id="birth_date" name="birth_date" class="form-control" placeholder="YYYYMMDD" oninput="formatDate(this)">
             </div>
             <div style="flex: 1;">
                 <label>성별</label>
@@ -444,6 +446,9 @@
             <span style = "font-size: 30px; font-weight: bold;" >{{ room.price|floatformat:0|intcomma }}원</span>
         </div>
     </div>
+    <!-- 숨겨진 input 필드 추가 -->
+    <input type="hidden" name="reservation_amount" value="{{ room.price|floatformat:0|intcomma }}">
+    <input type="hidden" name="total_amount" value="{{ room.price|floatformat:0|intcomma }}">
 
 
     <hr style="border: 0; border-top: 20px solid #9c9c9cd8; margin: 30px 0;">
@@ -528,9 +533,6 @@
         </div>
     </div>
 
-    
-    <!-- <button type="submit" class="custom-button" id="submit-button" disabled>예약하기</button> -->
-     <!-- 예약하기 버튼 -->
     <div class="button-container">
         <button type="submit" class="custom-button" id="submit-button" disabled>예약하기</button>
     </div>
@@ -538,6 +540,16 @@
     </form>
 </div>
 <script>
+
+    function formatDate(input) {
+        var date = input.value;
+        // 숫자만 입력되었는지 확인하고, 8자리인 경우 처리
+        if (date.length == 8 && !isNaN(date)) {
+            // 연, 월, 일로 분리하여 '-'로 연결
+            input.value = date.slice(0, 4) + '-' + date.slice(4, 6) + '-' + date.slice(6, 8);
+        }
+    }
+
     function fillDateFields() {
         var dateRange = document.getElementsByName("datefilter")[0].value;
         var dates = dateRange.split(" ~ ");
@@ -592,16 +604,17 @@
         document.getElementById("guestModal").style.display = "none";
     }
 
-    // 인원 수 저장
+
     function saveGuestCount() {
         event.preventDefault();
         var adultCount = document.getElementById("adultCount").value;
         var childCount = document.getElementById("childCount").value;
         document.getElementsByName("guestcount")[0].value = "성인 " + adultCount + " 아동 " + childCount;
 
-         // 숨겨진 입력 필드에 값 설정
-        document.getElementById("hiddenAdultCount").value = adultCount;
-        document.getElementById("hiddenChildCount").value = childCount;
+        // NodeList의 첫 번째 요소에 접근하여 값 설정
+        document.getElementsByName('guests_adult')[0].value = adultCount;
+        document.getElementsByName('guests_child')[0].value = childCount;
+
         closeGuestModal();
     }
 

@@ -93,6 +93,7 @@ class Reservation(models.Model):
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     guests_adult = models.PositiveIntegerField(default=2)  # 성인 인원수 필드
     guests_child = models.PositiveIntegerField(default=0)  # 아동 인원수 필드
+    telnum = models.CharField(max_length=15, blank=True, null=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.accommodation.name}"
@@ -112,14 +113,12 @@ class Review(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.accommodation.name}"
 
-# class AccommodationLike(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     accommodation = models.ForeignKey(Accommodation, related_name='likes', on_delete=models.CASCADE)
-#     created_at = models.DateTimeField(auto_now_add=True)
-
-
-
 # 취소 및 이용 규정 모델
 class CancellationPolicy(models.Model):
     policy_text = models.TextField()
     agree_text = models.TextField(null=True, blank=True)
+
+class AccommodationLike(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    accommodation = models.ForeignKey(Accommodation, related_name='likes', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)

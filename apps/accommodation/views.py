@@ -3,13 +3,12 @@ from rest_framework import status
 from rest_framework.views import APIView
 # from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Accommodation, Reservation, GuestInfo, TransportationInfo, Room, Review, AccommodationImage,  RoomImage, CancellationPolicy, ReservationHolderInfo,  DOMESTIC_ACCOMMODATION_TYPES
+from .models import Accommodation, Reservation, GuestInfo, TransportationInfo, Room, Review, AccommodationImage,  RoomImage, CancellationPolicy, ReservationHolderInfo,  DOMESTIC_ACCOMMODATION_TYPES, AccommodationLike
 from apps.userinfo.models import User
 from apps.travel.models import County, CountyImg
 from .serializers import AccommodationSerializer, ReservationSerializer, ReviewSerializer, UserSerializer, ReservationHolderInfoSerializer
-from django.template.response import TemplateResponse
 from django.shortcuts import render
-from django.db.models import Avg, Count
+from django.db.models import Avg, Q
 from django.conf import settings  
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -22,6 +21,8 @@ from .forms import ReviewForm, ReservationForm, ReservationHolderInfoForm, Guest
 from django.views.generic import ListView
 from django.http import JsonResponse
 
+
+
 # 숙소 조회
 class ListAccommodations(APIView):
     def get(self, request):
@@ -29,36 +30,44 @@ class ListAccommodations(APIView):
         serializer = AccommodationSerializer(accommodation, many=True)
         return Response(serializer.data)
 
-
-
-
+from datetime import datetime, date 
 
 # 숙소 상세 페이지 조회
 class AccomodationDetailView(APIView):
     def get(self, request, pk):
         user = request.user
         accommodation = Accommodation.objects.get(pk=pk)
+
+        # 현재 날짜를 가져오기
+        # requested_date = date.today()
+
+        # # 예약되어 있는 객실 필터링
+        # reservations = Reservation.objects.filter(
+        #     accommodation=accommodation,
+        #     check_in__lte=requested_date,
+        #     check_out__gt=requested_date
+        # )
+
+        # booked_rooms_ids = reservations.values_list('room_id', flat=True)
+
+
+
         room = Room.objects.filter(accommodation=accommodation)
+         # 이미 예약된 객실을 제외한 객실 리스트 구성
+        # available_rooms = room.exclude(id__in=booked_rooms_ids)
         reviews = Review.objects.filter(accommodation=accommodation)
         user_review = Review.objects.filter(accommodation=accommodation, user=request.user)
         reviews_count = reviews.count()
-        likes_count = accommodation.like.count()
+        likes_count = AccommodationLike.objects.filter(accommodation=accommodation).count()
 
-        # 출발일을 request에서 가져오기 (예: 'start_date'라는 쿼리 파라미터로 전달)
-        start_date_str = request.query_params.get('start_date')
-        if start_date_str:
-            start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
-        else:
-            start_date = datetime.now().date()  # 출발일이 없으면 기본값으로 오늘 날짜 사용
+        is_liked = AccommodationLike.objects.filter(user=request.user, accommodation=accommodation).exists()
+
 
         if reviews_count > 0:
             average_rating = reviews.aggregate(Avg('rating'))['rating__avg']
         else:
             average_rating = 0
 
-        # start_date = request.GET.get('start_date')
-        # room_prices = RoomPrice.objects.filter(accommodation=accommodation, date=start_date)
-    
         
         accommodation_images = AccommodationImage.objects.filter(accommodation=accommodation)  # Accommodation에 연결된 모든 이미지 가져오기
         room_images = RoomImage.objects.filter(room__in=room)
@@ -72,6 +81,7 @@ class AccomodationDetailView(APIView):
         context = {
             'accommodation': accommodation,
             'room': room,
+            # 'available_rooms': available_rooms,
             'user_review': user_review,
             'MEDIA_URL': settings.MEDIA_URL,
             'images': accommodation_images,
@@ -83,9 +93,9 @@ class AccomodationDetailView(APIView):
             'min_price_room_id': min_price_room_id,
             'user_has_reviewed': user_has_reviewed,
             'reviews': reviews,
+            'is_liked': is_liked,
             
 
-            # "liked": liked,
         }
         
         return render(request, 'accommodation/accommodation_detail.html', context)
@@ -105,6 +115,8 @@ def make_reservation(request, accommodation_pk, room_pk):
         holder_form = ReservationHolderInfoForm(request.POST)
         guest_form = GuestInfoForm(request.POST)
         transportation_form = TransportationInfoForm(request.POST)
+        reservation_amount = request.POST.get('reservation_amount')
+        total_amount = request.POST.get('total_amount')
 
         if (reservation_form.is_valid() and holder_form.is_valid() and
             guest_form.is_valid() and transportation_form.is_valid()):
@@ -124,6 +136,13 @@ def make_reservation(request, accommodation_pk, room_pk):
             reservation.transportation_info = transportation_info
             reservation.accommodation_id = accommodation_pk
             reservation.room_id = room_pk
+
+            try:
+                reservation.reservation_amount = float(reservation_amount.replace(',', '')) if reservation_amount else 0.0
+                reservation.total_amount = float(total_amount.replace(',', '')) if total_amount else 0.0
+            except ValueError:
+                # 여기에 오류 처리 로직 추가
+                pass
             reservation.save()
 
             return redirect('accommodation:reservation_success')  # Redirect to a success page
@@ -146,6 +165,7 @@ def make_reservation(request, accommodation_pk, room_pk):
     accommodation = Accommodation.objects.get(pk=accommodation_pk)
     accommodation_image = AccommodationImage.objects.filter(accommodation=accommodation).first()  # Accommodation에 연결된 모든 이미지 가져오기
 
+
     context = {
         'reservation_form': reservation_form,
         'holder_form': holder_form,
@@ -155,6 +175,7 @@ def make_reservation(request, accommodation_pk, room_pk):
         'accommodation': accommodation,
         'accommodation_image': accommodation_image,
         'MEDIA_URL': settings.MEDIA_URL,
+
     }
 
     return render(request, 'accommodation/create_reservation.html', context)
@@ -304,7 +325,7 @@ class UpdateReview(View):
                 review.image_url = request.FILES['image_url']
 
             form.save()
-            return redirect(reverse('review_detail', kwargs={'accommodation_pk': accommodation.pk, 'review_pk': review.pk}))
+            return redirect(reverse('accommodation:review_detail', kwargs={'accommodation_pk': accommodation.pk, 'review_pk': review.pk}))
         
         context = {
             'form': form,
@@ -332,7 +353,7 @@ class DeleteReview(View):
             return HttpResponseForbidden("You are not allowed to delete this review.")
 
         review.delete()
-        return redirect(reverse('accommodation_detail', kwargs={'pk': accommodation.pk}))
+        return redirect(reverse('accommodation:accommodation_detail', kwargs={'pk': accommodation.pk}))
 
 
 
@@ -512,11 +533,71 @@ def accommodation_region_list(request, accommodation_type, city_name):
     
     return render(request, 'accommodation/accommodation_region_list.html', context)
 
-# def accommodation_search(request):
-#     query = request.GET.get('q')
-#     if query:
-#         results = Accommodation.objects.filter(name__icontains=query)
-#     else:
-#         results = Accommodation.objects.all()
+@login_required
+@csrf_exempt
+def like_accommodation(request, accommodation_pk):
+    if request.method == 'POST':
+        accommodation = get_object_or_404(Accommodation, pk=accommodation_pk)
+        like, created = AccommodationLike.objects.get_or_create(accommodation=accommodation, user=request.user)
+        if created:
+            return JsonResponse({'status': 'ok'})
+        else:
+            return JsonResponse({'status': 'already_liked'})
+    return JsonResponse({'status': 'error'}, status=400)
+
+
+@login_required
+@csrf_exempt
+def unlike_accommodation(request, accommodation_pk):
+    if request.method == 'POST':
+        accommodation = get_object_or_404(Accommodation, pk=accommodation_pk)
+        AccommodationLike.objects.filter(accommodation=accommodation, user=request.user).delete()
+        return JsonResponse({'status': 'ok'})
+    return JsonResponse({'status': 'error'}, status=400)
+
+
+
+def search_accommodations(request):
+    query = request.GET.get('q', '').strip()
+
+    # 사용자가 이전에 본 숙소 목록을 세션에서 가져오기
+    viewed_accommodations = request.session.get('viewed_accommodations', [])
+
+    if query:
+        # 숙소 이름 또는 위치를 기반으로 검색
+        accommodations = Accommodation.objects.filter(
+            Q(name__icontains=query) | 
+            Q(city__city_name__icontains=query) | 
+            Q(city__first_town_name__icontains=query)
+        )
+        
+        results = []
+        for accommodation in accommodations:
+            first_image = accommodation.images.first()  # 숙소에 연결된 첫 번째 이미지 가져오기
+           
+            if accommodation.city:
+                location = f'{accommodation.city.city_name} {accommodation.city.first_town_name}'
+            else:
+                location = '위치 정보 없음'
+            image_url = first_image.images.url if first_image else None
+            results.append({
+                'name': accommodation.name,
+                'first_image_file': image_url,
+                'location': location,
+                'id': accommodation.pk,
     
-#     return render(request, 'accommodation/accommodation_list.html', {'accommodations': results})
+            })
+            # 현재 숙소를 리스트에 추가하고, 중복 제거 및 최신 5개만 유지
+            if accommodation.pk not in viewed_accommodations:
+                viewed_accommodations.append(accommodation.pk)
+                viewed_accommodations = viewed_accommodations[-5:]
+    else:
+        results = []
+          
+    # 수정된 viewed_accommodations 리스트를 세션에 저장
+    request.session['viewed_accommodations'] = viewed_accommodations
+    
+    return render(request, 'accommodation/search_accommodations.html', 
+                  {'results': results,
+                    'query': query,
+                    'viewed_accommodations': viewed_accommodations,})

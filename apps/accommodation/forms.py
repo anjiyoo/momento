@@ -24,7 +24,7 @@ from .models import Reservation, ReservationHolderInfo, GuestInfo, Transportatio
 class ReservationForm(forms.ModelForm):
     class Meta:
         model = Reservation
-        fields = ['check_in', 'check_out', 'cancellation_policy_agreed', 'terms_and_conditions_agreed', 'guests_adult', 'guests_child']
+        fields = ['check_in', 'check_out', 'cancellation_policy_agreed', 'terms_and_conditions_agreed', 'guests_adult', 'guests_child', 'telnum']
 
 
 class ReservationHolderInfoForm(forms.ModelForm):
@@ -34,7 +34,7 @@ class ReservationHolderInfoForm(forms.ModelForm):
 
     class Meta:
         model = ReservationHolderInfo
-        fields = ['username', 'email', 'telnum']
+        fields = ['username', 'email']
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
@@ -42,7 +42,6 @@ class ReservationHolderInfoForm(forms.ModelForm):
         if user:
             self.fields['username'].initial = user.username
             self.fields['email'].initial = user.email
-            self.fields['telnum'].initial = user.telnum  # Assuming telnum is in the User profile
 
 class GuestInfoForm(forms.ModelForm):
     class Meta:
