@@ -25,7 +25,7 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = "django-insecure-f@g1=x2m$6vc*a95odcx7p9qb&h%90plda%gki1=j3ld1jz$-d"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'apps.travel',
     'apps.baenangtalk',
     'apps.userinfo',
+    'apps.flights',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
