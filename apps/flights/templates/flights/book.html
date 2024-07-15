@@ -113,7 +113,7 @@
             <p id="stop-info">{{ flight.itineraries.0.segments|length }} Stop(s)</p>
             <p>{{ number_people }}인</p>
         </div>
-        <form method="post" action="{% url 'book_flight' %}" id="booking-form">
+        <form method="post" action="{% url 'flights:book_flight' %}" id="booking-form">
             {% csrf_token %}
             <input type="hidden" name="flight" id="flight-data">
             <input type="hidden" name="passengers" id="passengers-data">
