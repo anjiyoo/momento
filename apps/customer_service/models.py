@@ -12,12 +12,12 @@ class InquiryCategory(models.Model):
 
 class Inquiry(models.Model):
     inquiries_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)  # 유저 모델 외부키
-    category = models.ForeignKey(InquiryCategory, on_delete=models.CASCADE)  # 필드명 수정
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)  
+    category = models.ForeignKey(InquiryCategory, on_delete=models.CASCADE)  
     email = models.CharField(max_length=50)
-    phone_number = models.CharField(max_length=15)  # CharField로 변경
+    phone_number = models.CharField(max_length=15)  
     inquiry_title = models.CharField(max_length=50)
-    inquiry_body = models.TextField()  # 필드명 수정
+    inquiry_body = models.TextField()  
     created_at = models.DateTimeField(auto_now_add=True)
     answer_status = models.BooleanField(default=False)
 
@@ -30,7 +30,7 @@ class Inquiry(models.Model):
 
 class InquiryImage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    inquiry = models.ForeignKey(Inquiry, on_delete=models.CASCADE)  # 필드명 수정
+    inquiry = models.ForeignKey(Inquiry, on_delete=models.CASCADE)  
     image = models.ImageField(upload_to='inquiry_images/img')
 
     def __str__(self):
@@ -52,9 +52,9 @@ class InquiryComment(models.Model):
 
 
 class Notice(models.Model):
-    notice_title = models.CharField(max_length=255)  # max_length 추가
+    notice_title = models.CharField(max_length=255)  
     notice = models.TextField()
-    created_at = models.DateField(auto_now_add=True)  # DateTimeField로 변경
+    created_at = models.DateField(auto_now_add=True)  
 
     class Meta:
         ordering = ('-created_at',)
@@ -64,14 +64,13 @@ class Notice(models.Model):
 
 
 class FaqCategory(models.Model):
-    name = models.CharField(max_length=255)  # max_length 추가
-
+    name = models.CharField(max_length=255)  
     def __str__(self):
         return self.name
 
 
 class Faq(models.Model):
-    faq_title = models.CharField(max_length=255)  # max_length 추가
+    faq_title = models.CharField(max_length=255)  
     faq_answer = models.TextField()
     faq_category = models.ForeignKey(FaqCategory, on_delete=models.CASCADE)
 
