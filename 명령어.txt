@@ -18,3 +18,7 @@ pip install python-dotenv
 
 pip install pytz
 pip install djangorestframework
+
+pip install langchain-community
+pip install langchain-openai
+pip install langchain langchain_community psycopg2-binary
