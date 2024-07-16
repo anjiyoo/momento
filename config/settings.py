@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'apps.userinfo',
     'apps.flights',
     'rest_framework',
+    'apps.chatbot',
     'apps.customer_service',
 ]
 
