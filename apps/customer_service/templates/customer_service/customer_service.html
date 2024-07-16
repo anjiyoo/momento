@@ -1,0 +1,68 @@
+
+<head>
+    <meta charset="UTF-8">
+    <title>고객센터</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'customer_service/customer_service.css' %}">
+</head>
+<body>
+<div class="container">
+    <h1 class="section-title">고객센터</h1>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="inquiry-list">
+                <h2 class="section-title">모든 사용자들의 문의내역</h2>
+                {% for post in inquirys %}
+                <div class="inquiry-item">
+                    <a href="{% url 'customer_service:post_detail' post.inquiries_id %}">{{ post.inquiry_title }}</a>
+                    <div>
+                        {% if post.answer_status %}
+                        <span class="badge badge-success">답변 완료</span>
+                        {% else %}
+                        <span class="badge badge-warning">답변 대기중</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="alert alert-warning" role="alert">
+                    작성된 문의가 없습니다.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="faq-section">
+                <div class="faq-header">자주 묻는 질문</div>
+                <div class="faq-categories">
+                    <div>BEST</div>
+                    <div>항공</div>
+                    <div>숙소</div>
+                    <div>투어 티켓</div>
+                    <div>서비스 일반</div>
+                    <div>교통</div>
+                </div>
+                <div class="faq-item">Q. 계정을 잃어버렸어요.</div>
+                <div class="faq-item">Q. 숙소 예약 내역은 어디서 확인하나요?</div>
+                <div class="faq-item">Q. 기상 악화 결항 시 국내 항공권 취소 방법 및 취소 수수료가 궁금해요</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 my-inquiries">
+            <a href="#">내 문의내역</a>
+        </div>
+        <div class="col-md-6 inquiry-action">
+            <a href="{% url 'customer_service:inquiry_create' %}">문의하기</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

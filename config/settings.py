@@ -54,7 +54,8 @@ INSTALLED_APPS = [
     'apps.baenangtalk',
     'apps.userinfo',
     'apps.flights',
-    'rest_framework'
+    'rest_framework',
+    'apps.customer_service',
 ]
 
 MIDDLEWARE = [

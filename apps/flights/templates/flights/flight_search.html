@@ -158,7 +158,7 @@
 <div class="selected-flight" id="selectedFlightContainer" style="display: none;"></div>
 
 <script>
-    // CSRF 토큰 가져오기
+    // PULL해서 해보니까 CSRF오류떠서 CSRF 토큰 가져오기
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -351,7 +351,7 @@
             selectedReturnFlight = flight;
             displaySelectedFlight();
         }
-    }
+    }fetchReturnFlights
 
     function fetchReturnFlights() {
         const origin = document.getElementById('destination').value;
@@ -429,7 +429,7 @@
 
         selectedFlightContainer.style.display = 'block';
     }
-
+    // 받아온 데이터 detail로 보냄
     function viewFlightDetails() {
         const combinedFlight = {
             outbound: selectedOutboundFlight,

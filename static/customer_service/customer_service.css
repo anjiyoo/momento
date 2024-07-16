@@ -1,0 +1,66 @@
+.container {
+    margin-top: 50px;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.faq-section {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.faq-header {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.faq-categories {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.faq-categories div {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.faq-item {
+    margin-bottom: 10px;
+}
+
+.inquiry-list {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.inquiry-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.my-inquiries, .inquiry-action {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.my-inquiries a, .inquiry-action a {
+    display: block;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #333;
+}
+
+.my-inquiries a:hover, .inquiry-action a:hover {
+    background-color: #e9ecef;
+}

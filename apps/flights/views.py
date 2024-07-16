@@ -135,18 +135,18 @@ class Flights_Search(APIView):
 
             exchange_rate = get_exchange_rate()
 
-            if one_way:
+            if one_way: #편도
                 flights_data = search_flights(origin, destination, departure_date)
                 if flights_data:
                     flights_data = process_flights_data(flights_data, exchange_rate)
                     return Response(flights_data, status=status.HTTP_200_OK)
                 else:
                     return Response({'error': 'Failed to retrieve flight offers'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            else:
+            else: #왕복 
                 departure_flights_data = search_flights(origin, destination, departure_date)
                 return_date = data['return_date']
                 return_flights_data = search_flights(destination, origin, return_date)
-                
+                #합치기 
                 if departure_flights_data and return_flights_data:
                     departure_flights_data = process_flights_data(departure_flights_data, exchange_rate)
                     return_flights_data = process_flights_data(return_flights_data, exchange_rate)

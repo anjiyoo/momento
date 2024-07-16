@@ -29,5 +29,6 @@ urlpatterns = [
     path('  /', login_required(TemplateView.as_view(template_name='profile.html')), name='profile'),
     path('baenangtalk/', include("apps.baenangtalk.urls")),
     path('flights/',include('apps.flights.urls',namespace='flights')),
+    path('customer_service/',include('apps.customer_service.urls'))
   
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
