@@ -206,18 +206,15 @@ class PostDeleteView(DeleteView):
 def bae_post_like(request, pk):
     if request.method == 'POST':
         post = get_object_or_404(Baenangtalk, pk=pk)
+        user = request.user  # 현재 로그인된 사용자
 
-        if request.user.user:  # 사용자 계정인 경우
-            user = User.objects.get(user=request.user)
-
-            if user not in post.liked_by.all():
-                post.liked_by.add(user)
-                post.bae_like += 1
-                post.save()
-
+        if user not in post.bae_like_by.all():
+            post.bae_like_by.add(user)
+            post.bae_like += 1
+            post.save()
         return redirect('baenangtalk:bae_detail', pk=pk)
+        
     return redirect('baenangtalk:bae_detail', pk=pk)
-
 
 
 # 배낭톡 게시글 좋아요 취소
@@ -225,16 +222,14 @@ def bae_post_like(request, pk):
 def bae_post_unlike(request, pk):
     if request.method == 'POST':
         post = get_object_or_404(Baenangtalk, pk=pk)
+        user = request.user  # 현재 로그인된 사용자
 
-        if request.user.customer:  # 사용자 계정인 경우
-            user = User.objects.get(user=request.user)
-
-            if user in post.bae_like_by.all():
-                post.bae_like_by.remove(user)
-                post.bae_like -= 1
-                post.save()
-
+        if user in post.bae_like_by.all():
+            post.bae_like_by.remove(user)
+            post.bae_like -= 1
+            post.save()
         return redirect('baenangtalk:bae_detail', pk=pk)
+
     return redirect('baenangtalk:bae_detail', pk=pk)
 
 
@@ -248,7 +243,7 @@ def com_edit(request, comment_id):
         form = CommentEditForm(request.POST, instance=comment)
         if form.is_valid():
             form.save()
-            return redirect('baenangtalk:bae_detail', pk=comment.baenangtalk.pk)  # 댓글이 수정된 후 게시글 상세페이지로 이동
+            return redirect('baenangtalk:bae_detail', pk=comment.bae.pk) # 댓글이 수정된 후 게시글 상세페이지로 이동
     else:
         form = CommentEditForm(instance=comment)
     
@@ -257,13 +252,23 @@ def com_edit(request, comment_id):
 
 
 # 댓글 삭제
-def com_delete(request, comment_id):  
+@login_required
+def com_delete(request, comment_id):
     comment = get_object_or_404(BaenangtalkComment, id=comment_id)
-    
     if request.method == 'POST':
-        # 삭제
-        comment.delete()
-        return redirect('baenangtalk:bae_detail', pk=comment.baenangtalk.pk)  # 댓글이 삭제된 후 게시글 상세페이지로 이동
+        if comment.bae:  # comment.bae가 존재하는지 확인
+            comment.delete()
+            return redirect('baenangtalk:bae_detail', pk=comment.bae.pk)
+        else:
+            # 적절한 오류 메시지와 함께 다른 페이지로 리다이렉트
+            messages.error(request, "관련 게시글이 존재하지 않습니다.")
+            return redirect('baenangtalk:bae_main')  # 예를 들어 메인 페이지로 리다이렉트
+    else:
+        if comment.bae:
+            return render(request, 'comment/com_delete.html', {'object': comment})
+        else:
+            messages.error(request, "관련 게시글이 존재하지 않습니다.")
+            return redirect('baenangtalk:bae_main')
 
 
 
@@ -272,17 +277,16 @@ def com_delete(request, comment_id):
 def com_like(request, comment_id):
     if request.method == 'POST':
         comment = get_object_or_404(BaenangtalkComment, id=comment_id)
+        user = request.user  # 현재 로그인된 사용자
 
-        if request.user.customer:  # 사용자가 고객 계정인 경우
-            customer = Customer.objects.get(user=request.user)
 
-            if customer not in comment.bae_com_like_by.all():
-                comment.bae_com_like_by.add(customer)
-                comment.bae_com_like += 1
-                comment.save()
+        if user not in comment.bae_com_like_by.all():
+            comment.bae_com_like_by.add(user)
+            comment.bae_com_like += 1
+            comment.save()
+        return redirect('baenangtalk:bae_detail', pk=comment.bae.pk)
 
-        return redirect('baenangtalk:bae_detail', pk=comment.baenangtalk.pk)
-    return redirect('baenangtalk:bae_detail', pk=comment.baenangtalk.pk)
+    return redirect('baenangtalk:bae_detail', pk=comment.bae.pk)
 
 
 
@@ -291,14 +295,12 @@ def com_like(request, comment_id):
 def com_unlike(request, comment_id):
     if request.method == 'POST':
         comment = get_object_or_404(BaenangtalkComment, id=comment_id)
+        user = request.user  # 현재 로그인된 사용자
 
-        if request.user.customer:  # 사용자가 고객 계정인 경우
-            customer = Customer.objects.get(user=request.user)
-            
-            if customer in comment.bae_com_like_by.all():
-                comment.bae_com_like_by.remove(customer)
-                comment.bae_com_like -= 1
-                comment.save()
+        if user in comment.bae_com_like_by.all():
+            comment.bae_com_like_by.remove(user)
+            comment.bae_com_like -= 1
+            comment.save()
+        return redirect('baenangtalk:bae_detail', pk=comment.bae.pk)
 
-        return redirect('baenangtalk:bae_detail', pk=comment.baenangtalk.pk)
-    return redirect('baenangtalk:bae_detail', pk=comment.baenangtalk.pk)
+    return redirect('baenangtalk:bae_detail', pk=comment.bae.pk)

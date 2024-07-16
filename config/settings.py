@@ -25,7 +25,7 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = "django-insecure-f@g1=x2m$6vc*a95odcx7p9qb&h%90plda%gki1=j3ld1jz$-d"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -55,6 +55,9 @@ INSTALLED_APPS = [
     'apps.baenangtalk',
     'apps.userinfo',
     'apps.accommodation',
+    'apps.flights',
+    'rest_framework',
+    'apps.chatbot',
 ]
 
 MIDDLEWARE = [
@@ -185,7 +188,9 @@ MEDIA_ROOT = BASE_DIR/'media'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-LOGIN_REDIRECT_URL = '/'
 
 CSRF_TRUSTED_ORIGINS = ['https://127.0.0.1:8000']
 CSRF_COOKIE_SECURE = True
+
+LOGIN_REDIRECT_URL = '/'
+

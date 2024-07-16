@@ -24,11 +24,17 @@ from django.views.generic import TemplateView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include("apps.travel.urls")),
+
     path('mypage/', login_required(TemplateView.as_view(template_name='mypage.html')), name='mypage'),
     path('accounts/', include('allauth.urls')),
     path('accounts/profile/', login_required(TemplateView.as_view(template_name='profile.html')), name='profile'),
+    # path('  /', login_required(TemplateView.as_view(template_name='profile.html')), name='profile'),
+
     path('baenangtalk/', include("apps.baenangtalk.urls")),
+    path('flights/',include('apps.flights.urls',namespace='flights')),
+    path('chatbot/', include('apps.chatbot.urls')),
     path('accommodation/', include("apps.accommodation.urls")),
+
   
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

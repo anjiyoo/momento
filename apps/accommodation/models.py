@@ -9,7 +9,6 @@ DOMESTIC_ACCOMMODATION_TYPES = (
     ('pension_pool_vila', '펜션, 풀빌라'),
     ('camping_glamping', '캠핑, 글램핑'),
     ('boutique_motel', '부티크 모텔'),
-    ('hotel_resort', '호텔, 리조트'),
 )
 
 # 숙소 정보를 저장할 모델
@@ -78,7 +77,7 @@ class TransportationInfo(models.Model):
 
 
 class Reservation(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='accommodation_reservations')
     accommodation = models.ForeignKey(Accommodation, on_delete=models.CASCADE)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     check_in = models.DateField(blank=False, null=False) # 체크인 날짜
