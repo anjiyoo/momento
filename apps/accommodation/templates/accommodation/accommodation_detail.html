@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% load humanize %}
-{% block title %}Accommodation Detail{% endblock %}
+{% block title %}{{ accommodation.name }} 상세 페이지 {% endblock %}
 {% block content %}
   
     <style>
@@ -417,11 +417,11 @@
         <div style="display: flex; align-items: center; margin-right: 10px;margin-left: 10px">
 
             <div class="star-rating" id="star-rating" style="margin-right: 10px;">
-            <span class="star">&#9733;</span>
-            <span class="star">&#9733;</span>
-            <span class="star">&#9733;</span>
-            <span class="star">&#9733;</span>
-            <span class="star">&#9733;</span>
+            <span class="star"><i class="fas fa-star"></i></span>
+            <span class="star"><i class="fas fa-star"></i></span>
+            <span class="star"><i class="fas fa-star"></i></span>
+            <span class="star"><i class="fas fa-star"></i></span>
+            <span class="star"><i class="fas fa-star"></i></span>
         </div>
     
         <!-- 리뷰 수  -->
@@ -445,7 +445,6 @@
     <div class="d-flex justify-content-center"  style="display: flex; justify-content: center; gap: 150px;">
         <div style="text-align: center;">
             <i class="bi bi-heart {% if is_liked %}heart-fill{% else %}heart{% endif %}" id="save-button" style="display: block; font-size: 24px; cursor: pointer;"></i>
-            <!-- <i class="bi {% if is_liked %}bi-heart-fill{% else %}bi-heart{% endif %}" id="save-button" style="display: block; font-size: 24px; cursor: pointer;"></i> -->
             <span id="save-text" class="{% if is_liked %}button-cancel{% else %}button-save{% endif %}">
                 {% if is_liked %}저장취소{% else %}저장하기{% endif %}
             </span>
@@ -466,11 +465,12 @@
     </div>
 
     <!-- 구분선 -->
+
+    {% if min_price %}
     <hr style="border: 0; border-top: 20px solid #e7e7e7d8; margin: 30px 0;">
 
     <!-- 최저가 예약 / 객실 중 제일 싼 가격 띄우기 -->
-
-    <h2 style="font-weight: bold; margin-left: 50px; margin-top: 40px;">최저가 예약</h2>
+    <h2 style="font-weight: bold; margin-left: 50px; margin-top: 40px; margin-bottom: 40px;">최저가 예약</h2>
 
         {% csrf_token %}
         <div style="text-align: center;">
@@ -478,8 +478,8 @@
                        name="datefilter" 
                        class="daterange" 
                        style="margin-left: 50px; height: 38px; text-align: center; font-size: 16px;"  
-                       placeholder="날짜 선택"/>
-                       
+                       placeholder="날짜 선택"/> 
+                   
 
                  <input type="text" 
                        name="guestcount" 
@@ -500,7 +500,10 @@
                     onclick="scrollToRoom()">
                     {{ min_price|floatformat:0|intcomma }}원 >
                 </p>
-            </div> 
+            </div>
+            <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 30px;">
+
+{% endif %}
            
     
         <!-- 모달 창 -->
@@ -535,9 +538,8 @@
             
 
             <!-- 구분선 -->
-            <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 30px;">
 
-            <!-- <button onclick="applyGuestCount()">선택 완료</button> -->
+
             <div class="center-button">
                 <button onclick="applyGuestCount()">선택 완료</button>
             </div>
@@ -617,17 +619,6 @@
         <p>무료 취소 가능한 숙소가 없습니다.</p>
     </div>
 
-    <h1>예약 가능한 객실 목록</h1>
-    {% if available_rooms %}
-        <ul>
-            {% for room in available_rooms %}
-                <li>객실 번호: {{ room.number }}, 객실 유형: {{ room.type }}</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>예약 가능한 객실이 없습니다.</p>
-    {% endif %}
-
 
 </div>
 <!-- <hr style="border: 0; border-top: 20px solid #e7e7e7d8; margin: 30px 0;"> -->
@@ -640,6 +631,7 @@
     {% if reviews %}
         <ul>
             {% for review in reviews %}
+                <a  href="{% url 'accommodation:review_detail' accommodation_pk=accommodation.pk review_pk=review.pk %}">
                 <li style="list-style: none; margin-bottom: 20px;">
                     <div style="border: 1px solid #e7e7e7; border-radius: 10px; padding: 15px; box-shadow: none; border: none; position: relative;">
                         <div style="display: flex; align-items: center;">
@@ -672,6 +664,7 @@
                             <div style="margin-top: 10px;">
                                 <img src="{{ MEDIA_URL }}{{ review.image_url }}" alt="Review Image" style="max-width: 100%; border-radius: 10px;">
                             </div>
+                        </a>
                         {% endif %}
                         <div style="position: absolute; right: 15px; font-size: 0.8em; color: #909090; margin-right:30px; margin-top:10px;">
                             {{ review.created_at }}
@@ -695,6 +688,7 @@
     <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 20px;">
 
                 </li>
+
             {% endfor %}
         </ul>
     {% else %}
@@ -710,6 +704,21 @@
  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    
+    function deleteReview(reviewId, accommodationId) {
+        if (confirm("정말로 이 리뷰를 삭제하시겠습니까?")) {
+            fetch(`/accommodation/detail/${accommodationId}/review/${reviewId}/delete/`, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert("리뷰 삭제에 실패했습니다.");
+                }
+            });
+        }
+    }
     function scrollToReviews() {
         var reviewsSection = document.getElementById("reviewsSection");
         reviewsSection.scrollIntoView({ behavior: "smooth" });
@@ -770,6 +779,11 @@
         $(this).val(picker.startDate.format('MM.DD') + ' - ' + picker.endDate.format('MM.DD'));
         $('#check_in').val(picker.startDate.format('YYYY-MM-DD'));
         $('#check_out').val(picker.endDate.format('YYYY-MM-DD'));
+
+         // 선택한 날짜 서버로 전송
+        var start_date = picker.startDate.format('YYYY-MM-DD');
+        var end_date = picker.endDate.format('YYYY-MM-DD');
+        checkAvailability(start_date, end_date);
     });
 
     $('input[name="datefilter"]').on('cancel.daterangepicker', function(ev, picker) {
@@ -777,23 +791,8 @@
         $('#check_in').val('');
         $('#check_out').val('');
     });
-
    
 
-    function deleteReview(reviewId, accommodationId) {
-        if (confirm("정말로 이 리뷰를 삭제하시겠습니까?")) {
-            fetch(`/accommodation/detail/${accommodationId}/review/${reviewId}/delete/`, {
-                method: 'POST'
-            })
-            .then(response => {
-                if (response.ok) {
-                    location.reload();
-                } else {
-                    alert("리뷰 삭제에 실패했습니다.");
-                }
-            });
-        }
-    }
     
     
     
@@ -980,6 +979,7 @@
         .then(response => response.json())
         .then(data => {
             if (data.status === 'ok') {
+                window.location.reload();
                 if (isLiked) {
                     // 좋아요 취소 처리
                     this.classList.remove('heart-fill');
@@ -1007,7 +1007,7 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'), // CSRF 토큰 추가
+                // 'X-CSRFToken': getCookie('csrftoken'), // CSRF 토큰 추가
             },
         })
         .then(response => response.json())
@@ -1015,12 +1015,15 @@
             if(data.status === 'ok') {
                 const likeCountElement = document.querySelector('.like-count');
                 let likesCount = parseInt(likeCountElement.innerText);
+                window.location.reload();
                 if(action === 'like') {
                     likesCount++;
                     likeContainer.classList.add('liked');
+                    
                 } else {
                     likesCount--;
                     likeContainer.classList.remove('liked');
+        
                 }
                 likeCountElement.innerText = likesCount; // 좋아요 개수 업데이트
             } else {
@@ -1036,20 +1039,20 @@
     });
 
     // CSRF 토큰 가져오는 함수
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
+    // function getCookie(name) {
+    //     let cookieValue = null;
+    //     if (document.cookie && document.cookie !== '') {
+    //         const cookies = document.cookie.split(';');
+    //         for (let i = 0; i < cookies.length; i++) {
+    //             const cookie = cookies[i].trim();
+    //             if (cookie.substring(0, name.length + 1) === (name + '=')) {
+    //                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+    //                 break;
+    //             }
+    //         }
+    //     }
+    //     return cookieValue;
+    // }
 });
 
         });

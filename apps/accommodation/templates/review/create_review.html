@@ -1,32 +1,29 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>리뷰 작성</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% block title %}{{accommodation.name}} 리뷰 작성{% endblock %}
+
+{% block content %}
     <style>
         .container {
-            max-width: 800px; /* 최대 너비 설정 */
-            margin: 0 auto; /* 가운데 정렬 */
-            padding: 30px 20px; /* 내부 여백 설정 */
-            background-color: #ffffff; /* 박스 배경색 */
-            border-radius: 10px; /* 모서리 둥글게 */
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* 그림자 */
+            max-width: 800px; 
+            margin: 30px auto;
+            padding: 30px 20px; 
+            background-color: #ffffff; 
+            border-radius: 10px; 
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); 
         }
         .header {
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
-
-
         .star-rating {
             display: flex;
             flex-direction: row-reverse;
             justify-content: center;
+            margin-top: 20px;
         }
         .star-rating input[type="radio"] {
             display: none;
@@ -51,7 +48,7 @@
         }
         .submit-button {
             cursor: pointer;
-            color: blue; /* 필요에 따라 스타일 조정 */
+            color: blue;
             border: none;
             background-color: white;
         }
@@ -88,6 +85,10 @@
         .image-upload-wrapper .plus-icon {
             font-size: 48px;
             color: #ccc;
+        }
+        .back-button {
+            font-size: 24px;
+            margin-top: -10px;
         }
 
     </style>
@@ -143,17 +144,9 @@
     
         </form>
     </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
         
     <script>
-    
-
     $(document).ready(function(){
             $('#travel_date').daterangepicker({
                 singleDatePicker: true,
@@ -163,7 +156,9 @@
                 autoUpdateInput: false,
                 locale: {
                     format: 'YYYY-MM-DD'
-                }
+                },
+                maxDate: moment().subtract(1, 'days') // 오늘 이전 날짜만 선택 가능
+
                 
         });
        
@@ -195,7 +190,6 @@
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         imagePreview.src = e.target.result;
-                        // imagePreview.style.display = 'block';
                         imageContainer.style.display = 'block';
                     }
                     reader.readAsDataURL(file);
@@ -209,8 +203,10 @@
         });
         });
 
-
         const ratingText = document.getElementById('rating-text');
+        
+        ratingText.textContent = '별점을 선택하세요!';
+        ratingText.style.color = 'grey';
         const ratingLabels = {
             1: '별로예요',
             2: '조금 아쉬워요',
@@ -222,40 +218,40 @@
         document.querySelectorAll('.star-rating input').forEach(input => {
             input.addEventListener('change', function() {
                 ratingText.textContent = ratingLabels[this.value];
+                ratingText.style.color = 'initial'; 
             });
         });
 
-document.addEventListener('DOMContentLoaded', function() {
-    const submitButton = document.querySelector('.submit-button');
+    document.addEventListener('DOMContentLoaded', function() {
+        const submitButton = document.querySelector('.submit-button');
 
-    submitButton.addEventListener('click', function(event) {
-        event.preventDefault(); // 기본 폼 제출 방지
+        submitButton.addEventListener('click', function(event) {
+            event.preventDefault(); // 기본 폼 제출 방지
 
-        const form = document.getElementById('review-form');
-        const formData = new FormData(form);
+            const form = document.getElementById('review-form');
+            const formData = new FormData(form);
 
-        fetch(form.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.href = data.redirect_url; // 성공 시 리디렉션
-            } else {
-                // 에러 처리
-                console.error('Error:', data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.redirect_url; // 성공 시 리디렉션
+                } else {
+                    // 에러 처리
+                    console.error('Error:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
         });
     });
-});
 
     </script>
-</body>
-</html>
+{% endblock %}

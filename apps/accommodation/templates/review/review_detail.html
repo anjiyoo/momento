@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>리뷰 상세보기</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% block title %}{{review.user.username}}님의 리뷰{% endblock %}
+
+{% block content %}
     <style>
         .container {
             max-width: 800px;
@@ -15,6 +13,11 @@
             background-color: #ffffff;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .button-container {
+            max-width: 800px;
+            display: flex;
+    justify-content: flex-end;
         }
         .star-rating {
             font-size: 1em;
@@ -79,34 +82,20 @@
             margin-left: 20px;
         }
 
-        .accommodation-info {
-            display: flex;
-            flex-direction: column; /* 텍스트를 수직으로 정렬 */
+        
+        .heart-button {
+            border: none; /* 테두리 제거 */
+            padding: 0; /* 내부 여백 제거 */
+            margin: 0; /* 외부 여백 제거 */
+            background: none; /* 배경색 제거 */
         }
        
-        .heart-button {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            outline: none;
-            margin-left: 450px;
-        }
-        .heart-button:focus {
-            outline: none; /* 포커스 시 테두리 제거 */
-        }
-
-        .heart-button .fas {
-            color: red; /* 빨간색 하트 */
-            font-size: 24px;
-
-        }
-
-        .heart-button .far {
-            color: black; /* 검정 테두리 하트 */
-            background-color: white; /* 흰색 배경 */
-            border-radius: 50%; /* 원형으로 만들기 위해 추가 */
-            font-size: 24px;
+        .heart {
+            color: black; /* 기본 하트 색 */
+            }
+        .heart-fill {
+            color: red; /* 좋아요 상태일 때 하트 색 */
+ 
         }
         .dropdown-menu {
             display: none;
@@ -173,22 +162,25 @@
                 </div>
             </div>
         </div>
-        <div class="acommodation">
+        <div class="accommodation d-flex align-items-center">
             {% if images|length > 0 %}
-                <img src="{{ MEDIA_URL }}{{ images.0.images }}" class="profile-image" alt="Accommodation Image">
+                <img src="{{ MEDIA_URL }}{{ images.0.images }}" class="profile-image" alt="Accommodation Image" style="margin-right: 10px;">
             {% endif %}
-            <div class="accommodation-info">
-                <h5 style=" font-weight: bold;">
+            <div>
+                <h5 style="font-weight: bold; margin-bottom: 0;">
                     <a href="{% url 'accommodation:accommodation_detail' accommodation.pk %}" style="text-decoration: none; color: inherit;">
-                    {{ review.accommodation.name }}
+                        {{ review.accommodation.name }}
                     </a>
                 </h5>
-                <span style="font-weight: bold;">{{review.accommodation.city.city_name}}</span>
+                <span style="font-weight: bold; font-size: 14px;">{{ review.accommodation.city.city_name }}</span>
             </div>
-            <button class="heart-button">
-                <i class="fas fa-heart"></i>
-            </button>
+            <div class="ml-auto" style="margin-left: 450px;">
+                <button class="heart-button {% if accommodation_is_liked %}active{% endif %}">
+                    <i class="bi bi-heart {% if is_liked %}heart-fill{% else %}heart{% endif %}" id="save-button" style="display: block; font-size: 24px; cursor: pointer;"></i>
+                </button>
+            </div>
         </div>
+        
         <div class="user-profile">
             <img src="{{MEDIA_URL}}{{ review.user.profile }}" alt="User Profile Image">
             <div class="user-info">
@@ -285,6 +277,36 @@
                 }
             });
         });
-    </script>
-</body>
-</html>
+
+        document.getElementById('save-button').addEventListener('click', function() {
+            var isLiked = this.classList.contains('heart-fill');
+            var url = isLiked ? '/accommodation/detail/{{ accommodation.pk }}/unlike/' : '/accommodation/detail/{{ accommodation.pk }}/like/';
+        
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 'accommodationId': '{{ accommodation.pk }}' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    if (isLiked) {
+                        // 좋아요 취소 처리
+                        this.classList.remove('heart-fill');
+                        document.getElementById('save-text').className = 'button-save';
+                    } else {
+                        // 좋아요 처리
+                        this.classList.add('heart-fill');
+                        document.getElementById('save-text').className = 'button-cancel';
+                    }
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+                    
+</script>
+{% endblock %}

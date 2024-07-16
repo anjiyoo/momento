@@ -8,7 +8,7 @@ from apps.userinfo.models import User
 from apps.travel.models import County, CountyImg
 from .serializers import AccommodationSerializer, ReservationSerializer, ReviewSerializer, UserSerializer, ReservationHolderInfoSerializer
 from django.shortcuts import render
-from django.db.models import Avg, Q
+from django.db.models import Avg, Q, F
 from django.conf import settings  
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -38,24 +38,9 @@ class AccomodationDetailView(APIView):
         user = request.user
         accommodation = Accommodation.objects.get(pk=pk)
 
-        # 현재 날짜를 가져오기
-        # requested_date = date.today()
-
-        # # 예약되어 있는 객실 필터링
-        # reservations = Reservation.objects.filter(
-        #     accommodation=accommodation,
-        #     check_in__lte=requested_date,
-        #     check_out__gt=requested_date
-        # )
-
-        # booked_rooms_ids = reservations.values_list('room_id', flat=True)
-
-
-
         room = Room.objects.filter(accommodation=accommodation)
-         # 이미 예약된 객실을 제외한 객실 리스트 구성
-        # available_rooms = room.exclude(id__in=booked_rooms_ids)
-        reviews = Review.objects.filter(accommodation=accommodation)
+        reviews = Review.objects.filter(accommodation=accommodation).order_by('-user', '-created_at')
+
         user_review = Review.objects.filter(accommodation=accommodation, user=request.user)
         reviews_count = reviews.count()
         likes_count = AccommodationLike.objects.filter(accommodation=accommodation).count()
@@ -81,7 +66,6 @@ class AccomodationDetailView(APIView):
         context = {
             'accommodation': accommodation,
             'room': room,
-            # 'available_rooms': available_rooms,
             'user_review': user_review,
             'MEDIA_URL': settings.MEDIA_URL,
             'images': accommodation_images,
@@ -100,14 +84,14 @@ class AccomodationDetailView(APIView):
         
         return render(request, 'accommodation/accommodation_detail.html', context)
     
-
+    
 
 
 def reservation_success(request):
     return render(request, 'accommodation/reservation_success.html')
 
 
-# @method_decorator(login_required, name='dispatch')
+@method_decorator(login_required, name='dispatch')
 def make_reservation(request, accommodation_pk, room_pk):
 
     if request.method == 'POST':
@@ -267,23 +251,25 @@ class CreateReview(View):
                 review.user = request.user
             # review.user=user
             review.save()
-            redirect_url = reverse('review_detail', kwargs={'accommodation_pk': accommodation.pk, 'review_pk': review.pk})
+            redirect_url = reverse('accommodation:review_detail', kwargs={'accommodation_pk': accommodation.pk, 'review_pk': review.pk})
             return JsonResponse({'success': True, 'redirect_url': redirect_url})
         else:
             return JsonResponse({'success': False, 'error': form.errors})
 
 class ReviewDetailView(APIView):
     def get(self, request, accommodation_pk, review_pk):
+        user = request.user
         accommodation = get_object_or_404(Accommodation, pk=accommodation_pk)
-        accommodation_images = AccommodationImage.objects.filter(accommodation=accommodation) 
+        accommodation_images = AccommodationImage.objects.filter(accommodation=accommodation)
+        is_liked = AccommodationLike.objects.filter(user=request.user, accommodation=accommodation).exists()
 
         review = get_object_or_404(Review, pk=review_pk)
-        user = request.user
         context = {
             'accommodation': accommodation,
             'review': review,
             'MEDIA_URL': settings.MEDIA_URL,
             'images': accommodation_images,
+            'is_liked': is_liked,
         }
         return render(request, 'review/review_detail.html', context)
 
@@ -601,3 +587,40 @@ def search_accommodations(request):
                   {'results': results,
                     'query': query,
                     'viewed_accommodations': viewed_accommodations,})
+
+from datetime import datetime, timedelta
+class CheckAvailabilityAPI(View):
+    def get(self, request):
+        start_date_str = request.GET.get('start_date')
+        end_date_str = request.GET.get('end_date')
+        accommodation_id = request.GET.get('accommodation_id')
+        room_pk = request.GET.get('room_pk')
+
+        # 날짜 문자열을 datetime 객체로 변환
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+        end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+
+        # 예약 가능 여부 확인
+        available = check_availability(accommodation_id, start_date, end_date, room_pk)
+
+        # JSON 응답 반환
+        data = {'available': available}
+        return JsonResponse(data)
+    
+def check_availability(accommodation_id, start_date, end_date, room_pk):
+    # 예약 가능 여부를 판단할 날짜 범위
+    reservation_start = start_date
+    reservation_end = end_date 
+
+    # 선택한 객실과 예약된 예약을 확인
+    reserved_room = Reservation.objects.filter(
+        accommodation_id=accommodation_id,
+        room_id=room_pk,
+        check_in__lte=reservation_end,  # 예약 시작일이 예약 종료일보다 작거나 같아야 함
+        check_out__gte=reservation_start  # 예약 종료일이 예약 시작일보다 크거나 같아야 함
+    )
+
+    if reserved_room.exists():
+        return False  # 예약 불가능: 이미 예약된 객실이 있는 경우
+    else:
+        return True   # 예약 가능: 예약된 객실이 없는 경우

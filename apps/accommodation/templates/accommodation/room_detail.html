@@ -1,13 +1,9 @@
+{% extends 'base.html'%}
+
 {% load humanize %}
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Room Detail</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+{% block content %}
+
     <style>
         .container {
             max-width: 800px; /* 최대 너비 설정 */
@@ -46,7 +42,7 @@
 
         }
         .fixed-footer {
-            position: fixed;
+            /* position: fixed; */
             bottom: 0;
             left:50%;
             transform: translateX(-50%);
@@ -58,11 +54,14 @@
             text-align: center;
             z-index: 1000;
             border-radius: 8px;
+            margin-left: 380px;
+            margin-top: 20px;
         }
         .fixed-footer .btn {
             padding: 15px 300px; /* 버튼 크기 키우기 */
             border-radius: 10px; /* 버튼 둥글게 */
             font-size: 18px; /* 글자 크기 키우기 */
+            /* margin-left: 200px; */
         }
          
         .room-card {
@@ -87,9 +86,9 @@
     </style>
 </head>
 <body>
-    <a href="{% url 'accommodation:accommodation_detail' pk=accommodation.pk %}" class="back-button">
+    <!-- <a href="{% url 'accommodation:accommodation_detail' pk=accommodation.pk %}" class="back-button">
         <i class="fas fa-arrow-left"></i>
-    </a>
+    </a> -->
     <div class="container mt-4">
             <!-- 이미지 슬라이더 시작 -->
             <div id="roomImagesCarousel" class="carousel slide" data-ride="carousel">
@@ -167,13 +166,7 @@
             <div class="fixed-footer">
                 <a href="{% url 'accommodation:create_reservation' accommodation_pk=accommodation.pk room_pk=room.pk%}" class="btn btn-primary">예약하기</a>
             </div> 
-            <!-- <div class="fixed-footer">
-                <a href="{% url 'accommodation:create_reservation' accommodation_pk=accommodation.pk room_pk=room.pk %}?datefilter={{ request.GET.datefilter }}" class="btn btn-primary">예약하기</a>
-            </div> -->
             
     </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+    
+{% endblock %}
