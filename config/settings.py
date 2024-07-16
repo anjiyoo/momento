@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'apps.travel',
     'apps.baenangtalk',
     'apps.userinfo',
+    'apps.chatbot',
 ]
 
 MIDDLEWARE = [
