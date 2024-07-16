@@ -2,10 +2,10 @@ from django.db import models
 
 # 도시
 class County(models.Model):
-    city_name = models.CharField('도시명', max_length=10)  # 도시명
-    first_town_name = models.CharField('첫번째 하위도시명', max_length=10)  # 첫번째 하위도시
-    second_town_name = models.CharField('두번쨰 하위도시명', max_length=10, null=True, blank=True)  # 두번째 하위도시
-    third_town_name = models.CharField('세번째 하위도시명', max_length=10, null=True, blank=True)  # 세번째 하위도시
+    city_name = models.CharField('도시그룹', max_length=10)  # 도시그룹
+    first_town_name = models.CharField('첫번째 도시명', max_length=10)  # 첫번째 도시
+    second_town_name = models.CharField('두번쨰 도시명', max_length=10, null=True, blank=True)  # 두번째 도시
+    third_town_name = models.CharField('세번째 도시명', max_length=10, null=True, blank=True)  # 세번째 도시
 
     def __str__(self):
         return self.city_name
