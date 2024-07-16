@@ -17,4 +17,4 @@ class CountyImg(models.Model):
     city_name = models.ForeignKey(County, on_delete=models.CASCADE)  # 도시명
 
     def __str__(self):
-        return self.image.name    
+        return self.image.name  
