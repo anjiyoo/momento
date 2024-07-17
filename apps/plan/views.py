@@ -1,12 +1,15 @@
 from django.shortcuts import get_object_or_404, render 
 from django.views.generic import ListView
-from .models import Trip,Trip_style,CitySpot
+from .models import Trip,Trip_style,CitySpot,DayPlan
 from apps.travel.models import County
 from django.conf import settings
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import requests, json
 from datetime import datetime, timedelta
+from django.shortcuts import redirect
+from django.http import JsonResponse
+from django.db.models import F
 # Create your views here.
 API_KEY = settings.API_KEY
 # @api_view(['GET'])
@@ -70,7 +73,9 @@ def save_tour_data(region,cigungu1,cigungu2,cigungu3):
                 'title': item['title'],
                 'city': city,
                 'address': item.get('addr1', ''),
-                'image_url': item.get('firstimage', '')
+                'image_url': item.get('firstimage', ''),
+                'map_x': item['mapx'],
+                'map_y': item['mapy']
             }
         )
 # def update_tour_data(request, region):
@@ -116,7 +121,7 @@ def day_plan(request,region,cigungu1=0,cigungu2=0,cigungu3=0):
             end_date=end_date,
             who=who,
         )
-        if not tf : 
+        if tf : 
             new_trip = Trip.objects.get(
                 user=user,
                 city=city,
@@ -134,6 +139,12 @@ def day_plan(request,region,cigungu1=0,cigungu2=0,cigungu3=0):
             new = new_trip.start_date + timedelta(days=i)
             new_week = new.weekday()
             days.append(new.strftime("%m.%d/"+week[new_week]))
+        #origin day
+        origin_day = [new_trip.start_date.strftime("%Y-%m-%d")]
+        for i in range(1,day_cnt+1):
+            new = new_trip.start_date + timedelta(days=i)
+            origin_day.append(new.strftime("%Y-%m-%d"))
+        days = zip(days,origin_day)
 
         for i in style:
             new_style,tf = Trip_style.objects.get_or_create(
@@ -143,7 +154,7 @@ def day_plan(request,region,cigungu1=0,cigungu2=0,cigungu3=0):
             # new_style.save()
         save_tour_data(region,cigungu1,cigungu2,cigungu3)
         tour_spots = CitySpot.objects.filter(city__area_code=region)
-
+        plan = DayPlan.objects.filter(trip=new_trip.id)
     return render(
         request,
         'day_plan.html',
@@ -151,6 +162,41 @@ def day_plan(request,region,cigungu1=0,cigungu2=0,cigungu3=0):
             'new_trip':new_trip,
             'style':style,
             'tour_spots': tour_spots,
-            'days':days
+            'days':days,
+            'plan':plan,
+            'KAKAO_API_KEY':settings.KAKAO_API_KEY
          }
     )
+
+def add_plan(request):
+    
+    new_trip =  get_object_or_404(Trip, id=request.GET['trip_id'])
+    new_day = request.GET['day']
+    for id in request.GET['spot_content'].split(','):
+        new_spot = get_object_or_404(CitySpot,content_id=id)
+        dayplan,tf = DayPlan.objects.get_or_create(
+            trip = new_trip,
+            day = new_day,
+            spot = new_spot
+    )
+    plan=[]
+    for id in request.GET['spot_content'].split(','):
+        new_spot = get_object_or_404(CitySpot,content_id=id)
+        plan.append(list(DayPlan.objects.filter(trip=new_trip.id,spot=new_spot).annotate(title=F('spot__title'),address=F('spot__address')).values('title','address','trip','spot','memo','day'))[0])
+    region = new_trip.city.area_code
+    cigungu1 = new_trip.city.cigungu1
+    cigungu2 = new_trip.city.cigungu2
+    cigungu3 = new_trip.city.cigungu3
+    return JsonResponse(plan,safe=False)
+
+def plan(request):
+    new_trip =  get_object_or_404(Trip, id=request.GET['trip_id'])
+    plan = list(DayPlan.objects.filter(trip=new_trip.id).annotate(title=F('spot__title'),address=F('spot__address')).values('title','address','trip','spot','memo','day'))
+    return JsonResponse(plan,safe=False)
+
+def del_plan(request):
+    del_trip =  get_object_or_404(Trip, id=request.GET['trip_id'])
+    del_spot = get_object_or_404(CitySpot,id=request.GET['spot_id'])
+    DayPlan.objects.filter(trip=del_trip,spot=del_spot).delete()
+    plan=list(DayPlan.objects.filter(trip=del_trip).annotate(title=F('spot__title'),address=F('spot__address')).values('title','address','trip','spot','memo','day'))
+    return JsonResponse(plan,safe=False)

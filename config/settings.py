@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     # 앱경로
     'apps',
     'apps.travel',
-    'plan',
+    'apps.plan',
     'rest_framework'
 ]
 
@@ -164,3 +164,4 @@ environ.Env.read_env(
 
 # 설정한 변수를 읽어옴
 API_KEY = env('API_KEY')
+KAKAO_API_KEY = env('KAKAO_API_KEY')

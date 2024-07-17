@@ -21,6 +21,18 @@ class CitySpot(models.Model):
     address = models.TextField()
     image_url = models.URLField(blank=True, null=True)
     content_id = models.IntegerField(unique=True)
-
+    map_x = models.FloatField(default=0.0)
+    map_y = models.FloatField(default=0.0)
     def __str__(self):
         return self.title
+    
+# class TripDay(models.Model):
+#     trip = models.ForeignKey(Trip,on_delete=models.CASCADE)
+#     date = models.DateField()
+#     day_number = models.IntegerField()
+
+class DayPlan(models.Model):
+    trip = models.ForeignKey(Trip,on_delete=models.CASCADE)
+    spot = models.ForeignKey(CitySpot,on_delete=models.CASCADE)
+    memo = models.TextField()
+    day = models.DateField()

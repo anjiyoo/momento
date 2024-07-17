@@ -9,9 +9,9 @@ class County(models.Model):
     third_town_name = models.CharField('세번째 하위도시명', max_length=10, null=True, blank=True)  # 세번째 하위도시
     title_image = models.ImageField(upload_to='travel_title/%Y/%m',verbose_name='도시메인이미지')
     area_code = models.IntegerField(null=True)
-    cigungu1 = models.IntegerField(null=True,blank=True)
-    cigungu2 = models.IntegerField(null=True,blank=True)
-    cigungu3 = models.IntegerField(null=True,blank=True)
+    cigungu1 = models.IntegerField(null=True,blank=True,default=0)
+    cigungu2 = models.IntegerField(null=True,blank=True,default=0)
+    cigungu3 = models.IntegerField(null=True,blank=True,default=0)
     def __str__(self):
         return self.city_name
 
