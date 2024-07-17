@@ -24,8 +24,17 @@ from apps.userinfo.views import profile  # profile 뷰를 임포트합니다.
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include("apps.travel.urls")),
+
     path('mypage/', profile, name='mypage'),
     path('accounts/', include('allauth.urls')),
-    # 필요없는 url들은 홈으로 리디렉션 처리
-    # 특정 URL 패턴들을 홈으로 리디렉션
-    ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # path('  /', login_required(TemplateView.as_view(template_name='profile.html')), name='profile'),
+
+    path('baenangtalk/', include("apps.baenangtalk.urls")),
+    path('flights/',include('apps.flights.urls',namespace='flights')),
+    path('chatbot/', include('apps.chatbot.urls')),
+    path('plan/', include('apps.plan.urls')),
+    path('planrecommend/', include('apps.planrecommend.urls')),
+    # path('tour/', include('apps.tour.urls')),
+    path('customer_service/', include('apps.customer_service.urls')),
+  
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

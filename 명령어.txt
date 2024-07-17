@@ -10,3 +10,17 @@ python manage.py createsuperuser
 pip install freeze > requirements.txt
 
 pip install psycopg2
+pip install django-allauth
+pip install requests
+pip install PyJWT
+pip install cryptography
+pip install python-dotenv
+
+pip install pytz
+pip install djangorestframework
+
+pip install langchain-community
+pip install langchain-openai
+pip install langchain langchain_community psycopg2-binary
+
+pip install django-environ

@@ -9,8 +9,7 @@ class User(AbstractUser):
 
     def str(self):
         return self.username
-    
-    
+
     @property
     def profiles(self):
         if self.google_profile and self.google_profile.url: 

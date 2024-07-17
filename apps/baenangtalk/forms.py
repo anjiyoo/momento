@@ -31,9 +31,6 @@ class CommentcreateForm(forms.ModelForm):
     class Meta:
         model = BaenangtalkComment
         fields = ['bae_com_content']
-        labels = {
-            'bae_com_content': '댓글',  
-        }
 
 # 댓글 수정
 class CommentEditForm(forms.ModelForm):
@@ -41,7 +38,7 @@ class CommentEditForm(forms.ModelForm):
         model = BaenangtalkComment
         fields = ['bae_com_content']
         labels = {
-            'bae_com_content': '수정',  
+            'bae_com_content': '',  # 레이블을 빈 문자열로 설정
         }
 
 # 댓글 삭제
