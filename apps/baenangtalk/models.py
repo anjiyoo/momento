@@ -1,7 +1,6 @@
 from django.db import models
 from apps.travel.models import County
 from apps.userinfo.models import User
-from django.db.models import Count
 
 # 배낭톡 주제
 class BaenangtalkSubject(models.Model):

@@ -33,5 +33,9 @@ urlpatterns = [
     path('baenangtalk/', include("apps.baenangtalk.urls")),
     path('flights/',include('apps.flights.urls',namespace='flights')),
     path('chatbot/', include('apps.chatbot.urls')),
+    path('plan/', include('apps.plan.urls')),
+    path('planrecommend/', include('apps.planrecommend.urls')),
+    # path('tour/', include('apps.tour.urls')),
+    path('customer_service/', include('apps.customer_service.urls')),
   
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

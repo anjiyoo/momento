@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'planrecommend/main.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="card mb-4 mt-3 center shadow-sm" style="width: 30%; margin: 0 auto; text-align: center;">
+    <div class="card-body">
+        <i class="bi bi-globe-asia-australia"></i>
+        <h3 class="mt-4">떠나고 싶은 도시는?</h3>
+        <p id="select-city" class="mb-4">도시 1곳을 선택해주세요.</p>
+        
+        <!-- 도시 선택 -->
+        <div class="center" style="display: flex; justify-content: center;">
+            <div>
+                {% for county in counties|slice:":6" %}
+                    <div id="city-box" style="margin-bottom: 10px; margin-right: 10px;">{{ county.city_name }}</div>
+                {% endfor %}
+            </div>
+            <div>
+                {% for county in counties|slice:"6:11" %}
+                    <div id="city-box" style="margin-bottom: 10px;">{{ county.city_name }}</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 다음 버튼 -->
+        <div class="center mt-3 mb-3">
+            <a href="#">
+                <button id="next-button" class="btn btn-primary" style="width: 370px; height: 50px;">다음</button>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

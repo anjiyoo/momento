@@ -10,7 +10,6 @@ class County(models.Model):
     def __str__(self):
         return self.city_name
 
-
 # 도시 이미지
 class CountyImg(models.Model):
     image = models.ImageField(upload_to='travel/%Y/%m',verbose_name='도시이미지')  # 이미지 경로 : travel/연도/월

@@ -20,18 +20,10 @@
             {% endfor %}
             {% endfor %}
         </div>
-        <!-- 이전 -->
-        <a class="carousel-control-prev" href="#carousel-county" role="button" data-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        </a>
-        <!-- 다음 -->
-        <a class="carousel-control-next" href="#carousel-county" role="button" data-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        </a>
     </div>
 
     <!-- 아이콘 -->
-    <div class="row text-center shadow-sm">
+    <div class="row mt-5 text-center shadow-sm">
         <div class="col-md-4 mb-4">
             <a href="{% url 'flights:flight_search' %}" class="d-block">
                 <i class="bi bi-airplane" style="color: #0BD0AF; font-size: 4em;"></i>
@@ -51,6 +43,16 @@
             </a>
         </div>
     </div>
+
+    <!-- AI일정추천 -->
+    <div class="row mt-5 text-center">
+        <div>
+            <a href="{% url 'planrecommend:select_city' %}">
+                <img src="{% static 'ai_planrecommend.png' %}" alt="AI일정추천이미지" class="ai-recommendation-image"> <!-- Added class for styling -->
+            </a>
+        </div>
+    </div>
+
 </div>
 
 {% block extra_js %}
