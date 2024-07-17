@@ -13,31 +13,34 @@
             <!-- 질문 예시 -->
             <div class="mb-4">
                 <div class="btn-group" style="text-align: right;">
-                    <button type="button" class="btn btn-outline-light btn-custom" style="color: #0BD0AF; margin-right: 10px; border-radius: 10px;">
-                        가평 지역문화에 대해 알려줘
+                    <!-- 버튼에 onclick 이벤트 추가 -->
+                    <button type="button" class="btn btn-outline-light btn-custom" onclick="addQuestion('서울 지역문화에 대해 알려줘')" style="color: #0BD0AF; margin-right: 10px; border-radius: 10px;">
+                        서울 지역문화에 대해 알려줘
                     </button>
                     
-                    <button type="button" class="btn btn-outline-light btn-custom" style="color: #0BD0AF; margin-right: 10px; border-radius: 10px;">
-                        양평 관광지에 대해 알려줘
+                    <button type="button" class="btn btn-outline-light btn-custom" onclick="addQuestion('전주 관광지에 대해 알려줘')" style="color: #0BD0AF; margin-right: 10px; border-radius: 10px;">
+                        전주 관광지에 대해 알려줘
                     </button>
 
-                    <button type="button" class="btn btn-outline-light btn-custom" style="color: #0BD0AF; border-radius: 10px;">
-                        가평 지역음식에 대해 알려줘
+                    <button type="button" class="btn btn-outline-light btn-custom" onclick="addQuestion('부산 지역음식에 대해 알려줘')" style="color: #0BD0AF; border-radius: 10px;">
+                        부산 지역음식에 대해 알려줘
                     </button>
                 </div>
             </div>
 
-            <!-- 질문 입력 창 -->
+            <!-- 채팅창 -->
             <div class="card mb-4">
                 <div class="card-body">
-                    <!-- 채팅창 -->
-                    <div id="chat-container" class="chat-container" style="border-radius: 10px;">
-                        <!-- 채팅 메시지 -->
-                        <div id="chat-messages" class="chat-messages" style="border-radius: 10px;">
-                            <!-- 여기에 채팅 메시지가 동적으로 추가될 예정 -->
+                    <!-- 채팅창 배경 -->
+                    <div id="chat-container" class="chat-container" style="border-radius: 10px; height: 400px;">
+                        <!-- 채팅 목록 -->
+                        <div id="chat-message-list" class="chat-message-list" style="border-radius: 10px; background-color: #f4f4f8; height: 380px; overflow-y: auto;">
+                            <!-- 질문 -->
+                            <div id="chat-messages" class="chat-messages" style="border-radius: 10px; height: auto;"></div>
                         </div>
                     </div>
-                    <!-- 입력창 -->
+    
+                    <!-- 질문 입력창 -->
                     <div class="input-group mt-3 mb-3">
                         <input type="text" id="userInput" class="form-control" style="border-radius: 10px;" placeholder="지역에 대해 궁금한 내용을 입력해주세요">
                         <div class="input-group-append" style="margin-left: 10px;">

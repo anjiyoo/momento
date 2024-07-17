@@ -6,6 +6,14 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('chat-messages').innerText = "질문을 입력해주세요.";
             return; // 함수 실행 중지
         }
+
+        // 채팅창에 사용자 입력 바로 표시
+        var chatMessages = document.getElementById('chat-messages');
+        var questionDiv = document.createElement('div');
+        questionDiv.textContent = userQuery;
+        questionDiv.className = 'question';  // 질문에 'question' 클래스 추가
+        chatMessages.appendChild(questionDiv);
+
         // 서버에 /chatbot/response/ 엔드포인트로 POST 요청 보냄 (JSON 형식 데이터 포함)
         fetch('/chatbot/response/', {
             method: 'POST',
@@ -21,7 +29,10 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 // 서버에서 반환된 응답
                 if (data.message && data.message.trim() !== "") {
-                    document.getElementById('chat-messages').innerText = data.message;
+                    const answerDiv = document.createElement('div');
+                    answerDiv.textContent = data.message;
+                    answerDiv.className = 'answer';  // 답변에 'answer' 클래스 추가
+                    document.getElementById('chat-messages').appendChild(answerDiv);
                 } 
                 //서버에서 반환된 메시지가 없거나 빈 문자열인 경우에 실행
                 else { 
@@ -33,5 +44,17 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error:', error);
             document.getElementById('chat-messages').innerText = "통신 오류가 발생했습니다.";
         });
+
+        // 입력창 초기화
+        document.getElementById('userInput').value = '';
     });
 });
+
+
+// 챗봇 메인 화면 검색예시 버튼
+function addQuestion(question) {
+    const chatMessages = document.getElementById('chat-messages');
+    const messageDiv = document.createElement('div');
+    messageDiv.textContent = question;
+    chatMessages.appendChild(messageDiv);
+}

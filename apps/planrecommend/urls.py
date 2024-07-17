@@ -1,9 +1,9 @@
 from django.urls import path
-from . import views
+from .views import *
 
 app_name = 'planrecommend'
 
 urlpatterns = [
-    path('', views.planrecommend_main, name='planrecommend_main'),
+    path('', SelectCityListView.as_view(), name='select_city'),
 
 ]

@@ -5,7 +5,7 @@ from apps.userinfo.models import User
 # 여행일정
 class TripRecommend(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)  # 유저 모델 외부키
-    city_name = models.ForeignKey(County,on_delete=models.SET_NULL, null=True)  # 도시 외부키 참조
+    city_name = models.ForeignKey(County, on_delete=models.SET_NULL, null=True)  # 도시 외부키 참조
     rec_who = models.CharField(max_length=20,default='혼자')  # 동행자 정보
     rec_start_date = models.DateField()  # 여행기간(출발)
     rec_end_date = models.DateField()  # 여행기간(도착)

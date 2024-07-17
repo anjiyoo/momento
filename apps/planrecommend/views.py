@@ -3,5 +3,10 @@ from .models import *
 from django.views.generic import *
 
 # planrecommend main
-def planrecommend_main(request):
-    return render(request, 'planrecommend_main.html')
+class SelectCityListView(View):
+    template_name = 'select_city.html'
+
+    def get(self, request, *args, **kwargs):
+        counties = County.objects.all()
+        context = {'counties': counties}
+        return render(request, self.template_name, context)
