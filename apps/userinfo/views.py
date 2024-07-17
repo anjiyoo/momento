@@ -1,29 +1,23 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, get_object_or_404
-from django.contrib.auth import get_user_model
-from django.http import HttpResponse
+from django.contrib import messages
 from .forms import UserEditForm
-from django.core.paginator import Paginator
-from django.db.models import Count, Sum
-
-
-User = get_user_model()
 
 @login_required
 def profile(request):
-    
-
-    
-    
     if request.method == 'POST':
-        form = UserEditForm(request.POST, request.FILES, instance=request.user)  # request.user는 현재 로그인한 사용자의 인스턴스
+        form = UserEditForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
-            return redirect('home')  # 프로필 페이지로 리다이렉트
+            messages.success(request, '프로필이 성공적으로 업데이트되었습니다.')
+            return redirect('mypage')  # 저장 후 다시 프로필 페이지로 리다이렉트
         else:
-            return render(request, 'accounts/profile.html', {'form': form,})
+            messages.error(request, '프로필 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.')
     else:
-        form = UserEditForm(instance=request.user)  # 폼을 초기화할 때 현재 사용자 정보로 채웁니다
+        form = UserEditForm(instance=request.user)
     
-    return render(request, 'accounts/profile.html', {'form': form})
+    context = {
+        'form': form,
+        'user': request.user,
+    }
+    return render(request, 'mypage.html', context)

@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'crispy_forms',
     # 앱경로
     'apps',
     'apps.travel',
@@ -92,24 +93,24 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 # DB postgresql 설정
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT'),
-    }
-}
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': os.getenv('DB_NAME'),
+#        'USER': os.getenv('DB_USER'),
+#        'PASSWORD': os.getenv('DB_PASSWORD'),
+#        'HOST': os.getenv('DB_HOST'),
+#        'PORT': os.getenv('DB_PORT'),
+#    }
+#}
 
 # DB local sqlite 설정
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+DATABASES = {
+     'default': {
+         'ENGINE': 'django.db.backends.sqlite3',
+         'NAME': BASE_DIR / 'db.sqlite3',
+     }
+ }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -183,4 +184,15 @@ MEDIA_ROOT = BASE_DIR/'media'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/mypage'
+LOGOUT_REDIRECT_URL = '/'
+
+
+# 이메일 필수 설정
+SOCIALACCOUNT_EMAIL_REQUIRED = True
+
+# 이메일 검증 생략
+SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'
+
+# 자동 가입 설정
+SOCIALACCOUNT_AUTO_SIGNUP = True

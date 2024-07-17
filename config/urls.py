@@ -15,18 +15,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView
-
+from apps.userinfo.views import profile  # profile 뷰를 임포트합니다.
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include("apps.travel.urls")),
-    path('mypage/', login_required(TemplateView.as_view(template_name='mypage.html')), name='mypage'),
+    path('mypage/', profile, name='mypage'),
     path('accounts/', include('allauth.urls')),
-    path('accounts/profile/', login_required(TemplateView.as_view(template_name='profile.html')), name='profile'),
-    path('baenangtalk/', include("apps.baenangtalk.urls")),
-  
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # 필요없는 url들은 홈으로 리디렉션 처리
+    # 특정 URL 패턴들을 홈으로 리디렉션
+    ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
