@@ -63,7 +63,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     #allauth
-    'django.contrib.sites',  # 필요한 경우
+    # 'django.contrib.sites',  # 필요한 경우
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
