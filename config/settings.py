@@ -14,12 +14,27 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 import os
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
 load_dotenv()
+
 # load_dotenv(os.path.join(BASE_DIR, '.env'))
+
+# # 환경변수를 불러올 수 있는 상태로 설정
+# env = environ.Env(DEBUG=(bool, True))
+
+# # 읽어올 환경 변수 파일을 지정
+# environ.Env.read_env(
+#   env_file = os.path.join(BASE_DIR, '.env')
+# )
+
+# # 설정한 변수를 읽어옴
+# API_KEY = env('API_KEY')
+# KAKAO_API_KEY = env('KAKAO_API_KEY')
 
 
 # Quick-start development settings - unsuitable for production
@@ -32,7 +47,8 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # EXTERNAL_BASE_URL = "http://3.34.42.116/"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
+DEBUG = True  # 환경변수 가져와서 true이면 debug=true
 
 ALLOWED_HOSTS = ['*']
 
@@ -60,6 +76,10 @@ INSTALLED_APPS = [
     'apps.flights',
     'rest_framework',
     'apps.chatbot',
+    'apps.plan',
+    'apps.planrecommend',
+    # 'apps.tour',
+    'apps.customer_service',
 ]
 
 MIDDLEWARE = [

@@ -16,7 +16,9 @@ import os
 from datetime import datetime
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-load_dotenv(os.path.join(BASE_DIR, '.env'))
+# load_dotenv(os.path.join(BASE_DIR, '.env'))
+
+load_dotenv()  # 환경 변수 파일 로드
 
 # 환경 변수 로드
 api_key = os.getenv('FLIGHTS_API_KEY')
