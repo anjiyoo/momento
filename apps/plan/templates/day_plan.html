@@ -121,11 +121,27 @@
     font-weight: 900;
     height: 40px;
 }
+.customoverlay {
+    background: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+.customoverlay .title {
+    font-size: 14px;
+    font-weight: bold;
+}
 </style>
 <div class="container">
 <div class="trip-planner">
     <div class="trip-header">
-      <h1 class="trip-title">{{new_trip.city}} 여행<span class="edit-option">편집</span></h1>
+      <form action="{% url 'plan:days' %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="city" value="{{new_trip.city}}">
+        <input type="hidden" name="trip" value="{{new_trip.id}}">
+        <h1 class="trip-title">{{new_trip.city}} 여행
+        <button type="submit" style="border: 0; background-color: transparent;" class="edit-option">편집</button></h1>
+      </form>
       <p class="trip-date">{{new_trip.start_date|date:"Y.m.d"}} ~ {{new_trip.end_date|date:"Y.m.d"}}</p>
       <p class="trip-type">{{new_trip.who}} | {%for i in style%}{{i}}{%endfor%}</p>
     </div>
@@ -450,50 +466,118 @@ function addPlan(){
         })
         
       }
-      const REST_API_KEY = 'REST_API_KEY';
+      async function getCarDirection() {
+      const REST_API_KEY = '{{REST_API_KEY}}';
       const url = 'https://apis-navi.kakaomobility.com/v1/directions';
+      for(var idx=0; idx<map_xy.length-1; idx++){
+        const origin = `${map_xy[idx][0]},${map_xy[idx][1]}`
+        const destination = `${map_xy[idx+1][0]},${map_xy[idx+1][1]}`
+        // 요청 헤더를 추가
+        const headers = {
+          Authorization: `KakaoAK ${REST_API_KEY}`,
+          'Content-Type': 'application/json'
+        };
+        //요청 파라미터에 필수값
+        const queryParams = new URLSearchParams({
+          origin: origin,
+          destination: destination
+        });
+        const requestUrl = `${url}?${queryParams}`; // 파라미터까지 포함된 전체 URL
+        console.log(requestUrl)
+        try {
+        const response = await fetch(requestUrl, {
+          method: 'GET',
+          headers: headers
+        });
+  
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+  
+        const data = await response.json();
+        console.log(data)
+  
+        const linePath = [];
+        data.routes[0].sections[0].roads.forEach(router => {
+          router.vertexes.forEach((vertex, index) => {
+            // x,y 좌표 인덱스가 짝수일 때만 linePath에 넣어봅시다.
+            if (index % 2 === 0) {
+              linePath.push(new kakao.maps.LatLng(router.vertexes[index + 1], router.vertexes[index]));
+            }
+          });
+        });
+        var polyline = new kakao.maps.Polyline({
+          path: linePath,
+          strokeWeight: 5,
+          strokeColor: '#000000',
+          strokeOpacity: 0.7,
+          strokeStyle: 'solid'
+        }); 
+        polyline.setMap(map);
+        var lengthInMeters = polyline.getLength();
+        var lengthInKm = (lengthInMeters / 1000).toFixed(2);  // 킬로미터 단위로 변환하고 소수점 둘째 자리까지 표시
+      
+        console.log("길이: " + lengthInMeters.toFixed(2) + " 미터");
+        console.log("길이: " + lengthInKm + " 킬로미터");
+        // 경로의 중간 지점 계산
+        var middleIndex = Math.floor(linePath.length / 2);
+        var middlePosition = linePath[middleIndex];
 
+        // 커스텀 오버레이 생성
+        var content = '<div class="customoverlay">' +
+                      '  <span class="title">' + lengthInKm + ' km</span>' +
+                      '</div>';
 
-    // 선을 구성하는 좌표 배열입니다. 이 좌표들을 이어서 선을 표시합니다
-      var linePath = [
-          new daum.maps.LatLng(37.6613809173,127.5239353212 ),
-          new daum.maps.LatLng(37.8594737524, 127.480533482) 
-      ];
+        var customOverlay = new kakao.maps.CustomOverlay({
+          map: map,
+          position: middlePosition,
+          content: content,
+          yAnchor: 1 
+        });
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+      }
+      // const origin = '127.5239353212,37.6613809173';
+      // const destination = '127.480533482,37.8594737524 ';
+      
+  getCarDirection();
+    // // 선을 구성하는 좌표 배열입니다. 이 좌표들을 이어서 선을 표시합니다
+    //   var linePath = [
+    //       new daum.maps.LatLng(37.6613809173,127.5239353212 ),
+    //       new daum.maps.LatLng(37.8594737524, 127.480533482) 
+    //   ];
 
-      // 지도에 표시할 선을 생성합니다
-      var polyline = new daum.maps.Polyline({
-          path: linePath, // 선을 구성하는 좌표배열 입니다
-          strokeWeight: 5, // 선의 두께 입니다
-          strokeColor: 'black', // 선의 색깔입니다
-          strokeOpacity: 0.7, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
-          strokeStyle: 'dashed' // 선의 스타일입니다
-      });
-      var lengthInMeters = polyline.getLength();
-      var lengthInKm = (lengthInMeters / 1000).toFixed(2);  // 킬로미터 단위로 변환하고 소수점 둘째 자리까지 표시
+    //   // 지도에 표시할 선을 생성합니다
+    //   var polyline = new daum.maps.Polyline({
+    //       path: linePath, // 선을 구성하는 좌표배열 입니다
+    //       strokeWeight: 5, // 선의 두께 입니다
+    //       strokeColor: 'black', // 선의 색깔입니다
+    //       strokeOpacity: 0.7, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+    //       strokeStyle: 'dashed' // 선의 스타일입니다
+    //   });
 
-      console.log("길이: " + lengthInMeters.toFixed(2) + " 미터");
-      console.log("길이: " + lengthInKm + " 킬로미터");
+      // // 거리 정보를 표시할 div 요소 생성
+      // var distanceDiv = document.createElement('div');
+      // distanceDiv.className = 'distance-info';
+      // distanceDiv.innerHTML = lengthInKm + ' km ';
 
-      // 거리 정보를 표시할 div 요소 생성
-      var distanceDiv = document.createElement('div');
-      distanceDiv.className = 'distance-info';
-      distanceDiv.innerHTML = lengthInKm + ' km ';
+      // // 스타일 설정
+      // distanceDiv.style.position = 'absolute';
+      // distanceDiv.style.bottom = '78px';
+      // distanceDiv.style.left = '110px';
+      // distanceDiv.style.backgroundColor = 'white';
+      // distanceDiv.style.padding = '5px';
+      // distanceDiv.style.border = '1px solid #E2E2E2';
+      // distanceDiv.style.borderRadius = '5px';
+      // distanceDiv.style.zIndex = '1000';
 
-      // 스타일 설정
-      distanceDiv.style.position = 'absolute';
-      distanceDiv.style.bottom = '78px';
-      distanceDiv.style.left = '110px';
-      distanceDiv.style.backgroundColor = 'white';
-      distanceDiv.style.padding = '5px';
-      distanceDiv.style.border = '1px solid #E2E2E2';
-      distanceDiv.style.borderRadius = '5px';
-      distanceDiv.style.zIndex = '1000';
+      // // 지도 컨테이너에 거리 정보 div 추가
+      // var mapContainer = document.getElementById('93'); // 여기서 'map'은 지도를 표시하는 div의 id입니다
+      // mapContainer.appendChild(distanceDiv);
 
-      // 지도 컨테이너에 거리 정보 div 추가
-      var mapContainer = document.getElementById('93'); // 여기서 'map'은 지도를 표시하는 div의 id입니다
-      mapContainer.appendChild(distanceDiv);
-
-      polyline.setMap(map);
+      
       marker.setMap(map);
 </script>
 {% endblock %}

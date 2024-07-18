@@ -10,8 +10,15 @@ from datetime import datetime, timedelta
 from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.db.models import F
+import os
+from dotenv import load_dotenv
+load_dotenv()  # 환경 변수 파일 로드
+
+API_KEY = os.getenv('API_KEY') 
+KAKAO_API_KEY = os.getenv('KAKAO_API_KEY')
+REST_API_KEY = os.getenv('REST_API_KEY')
 # Create your views here.
-API_KEY = settings.API_KEY
+
 # @api_view(['GET'])
 def get_tour_data(region,cigungu1,cigungu2,cigungu3):
     url = 'http://apis.data.go.kr/B551011/KorService1/areaBasedList1'
@@ -93,13 +100,20 @@ class CityList(ListView):
     template_name = 'county_list.html' 
 
 def days(request):
+    
     if request.method == 'POST':
         city = get_object_or_404(County, city_name=request.POST['city'])
+        #수정버튼경로
+        try:
+            trip = Trip.objects.get(id=request.POST['trip'])
+        except:
+            trip = None
     return render(
         request,
         'days.html',
         {
-            'city':city
+            'city':city,
+            'trip':trip
         }
     )
 
@@ -113,22 +127,32 @@ def day_plan(request,region,cigungu1=0,cigungu2=0,cigungu3=0):
         end_date = date[1]
         who = request.POST['who']
         style = request.POST.getlist('style')
-
-        new_trip,tf = Trip.objects.get_or_create(
-            user=user,
-            city=city,
-            start_date=start_date,
-            end_date=end_date,
-            who=who,
-        )
-        if tf : 
-            new_trip = Trip.objects.get(
+        #수정버튼경로
+        if request.POST['trip']:
+            new_trip = Trip.objects.get(id=request.POST['trip'])
+            new_trip.start_date=start_date
+            new_trip.end_date=end_date
+            who=who
+            new_trip.save()
+            new_trip = Trip.objects.get(id=request.POST['trip'])
+        #신규생성
+        else:
+            new_trip,tf = Trip.objects.get_or_create(
                 user=user,
                 city=city,
                 start_date=start_date,
                 end_date=end_date,
                 who=who,
             )
+            if tf : 
+                new_trip = Trip.objects.get(
+                    user=user,
+                    city=city,
+                    start_date=start_date,
+                    end_date=end_date,
+                    who=who,
+                )
+
         # new_trip.save()
         # 날짜 계산
         day_cnt = (new_trip.end_date - new_trip.start_date).days
@@ -145,7 +169,10 @@ def day_plan(request,region,cigungu1=0,cigungu2=0,cigungu3=0):
             new = new_trip.start_date + timedelta(days=i)
             origin_day.append(new.strftime("%Y-%m-%d"))
         days = zip(days,origin_day)
-
+        try:
+            Trip_style.objects.get(trip=new_trip).delete()
+        except:
+            pass
         for i in style:
             new_style,tf = Trip_style.objects.get_or_create(
                 trip = new_trip,
@@ -164,7 +191,8 @@ def day_plan(request,region,cigungu1=0,cigungu2=0,cigungu3=0):
             'tour_spots': tour_spots,
             'days':days,
             'plan':plan,
-            'KAKAO_API_KEY':settings.KAKAO_API_KEY
+            'KAKAO_API_KEY':KAKAO_API_KEY,
+            'REST_API_KEY':REST_API_KEY
          }
     )
 

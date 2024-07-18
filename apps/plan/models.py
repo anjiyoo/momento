@@ -26,10 +26,6 @@ class CitySpot(models.Model):
     def __str__(self):
         return self.title
     
-# class TripDay(models.Model):
-#     trip = models.ForeignKey(Trip,on_delete=models.CASCADE)
-#     date = models.DateField()
-#     day_number = models.IntegerField()
 
 class DayPlan(models.Model):
     trip = models.ForeignKey(Trip,on_delete=models.CASCADE)

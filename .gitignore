@@ -61,6 +61,12 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 
+# 모든 migrations 파일을 무시
+**/migrations/*.py
+
+# init.py 파일은 예외로 설정
+!**/migrations/__init__.py
+
 # Flask stuff:
 instance/
 .webassets-cache
