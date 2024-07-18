@@ -14,6 +14,13 @@ document.addEventListener('DOMContentLoaded', function() {
         questionDiv.className = 'question';  // 질문에 'question' 클래스 추가
         chatMessages.appendChild(questionDiv);
 
+        // 서버 응답을 기다리는 동안의 메시지
+        var waitingDiv = document.getElementById('waiting');
+        var questionDiv = document.createElement('div');
+        waitingDiv.textContent = "...";
+        waitingDiv.className = 'waiting';  // 대기 메시지에 'waiting' 클래스 추가
+        chatMessages.appendChild(waitingDiv);
+
         // 서버에 /chatbot/response/ 엔드포인트로 POST 요청 보냄 (JSON 형식 데이터 포함)
         fetch('/chatbot/response/', {
             method: 'POST',
@@ -24,6 +31,12 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
+            // 기존의 "..." 메시지 삭제
+            var waitingDiv = document.querySelector('.waiting');
+            if (waitingDiv) {
+                waitingDiv.remove();
+            }
+
             if (data.error) {
                 document.getElementById('chat-messages').innerText = "서버에서 오류가 발생했습니다: " + data.error;
             } else {
@@ -53,8 +66,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 챗봇 메인 화면 검색예시 버튼
 function addQuestion(question) {
-    const chatMessages = document.getElementById('chat-messages');
-    const messageDiv = document.createElement('div');
-    messageDiv.textContent = question;
-    chatMessages.appendChild(messageDiv);
+    document.getElementById('userInput').value = question;
 }

@@ -33,6 +33,18 @@ h1, h2, h3, h4, h5, h6 {
     text-align: right; /* 텍스트 우측 정렬 */
 }
 
+/* 응답.. */
+.waiting {
+    padding: 10px 10px;
+    margin: 25px;
+    border-radius: 10px;
+    background-color: #0BD0AF;
+    color: white;
+    width: auto; /* 너비를 내용에 맞게 조절 */
+    min-width: 50px; /* 최소 너비 설정 */
+    max-width: 20px; /* 최대 너비 설정 */
+}
+
 /* 답변 */
 .answer {
     padding: 10px 10px;
